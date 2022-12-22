@@ -16,9 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })
 
-const handleError = id => {
-  const input = document.querySelector(`#${id}`)
-  console.log(input)
+const validate = input => {
+  if (input.classList.contains('error')) return
   input.classList.add('error')
   const parent = input.parentElement
   const error = document.createElement('p')
@@ -29,16 +28,16 @@ const handleError = id => {
 
 const register = () => {
   const inputs = document.querySelectorAll('input')
-  for (let input of inputs) {
-    input.classList.remove('error')
-  }
-  document.querySelectorAll('.error-text').forEach(el => el.remove())
 
   const [username, password, email, rep_email] = inputs
-  if (!username.value) handleError(username.id)
-  if (!password.value) handleError(password.id)
-  if (!email.value) handleError(email.id)
-  if (!rep_email.value) handleError(rep_email.id)
+  validate(username)
+  validate(password)
+  validate(email)
+  validate(rep_email)
+
+  //TODO
+  // if (Array(inputs).some(el => el.classList.includes('error')))
+  //   return console.log('dalej błędy')
 }
 
 const offlineView = () => {
