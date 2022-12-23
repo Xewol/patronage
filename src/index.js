@@ -15,30 +15,72 @@ document.addEventListener('DOMContentLoaded', () => {
     offlineView()
   }
 })
-
-const handleError = id => {
-  const input = document.querySelector(`#${id}`)
-  console.log(input)
-  input.classList.add('error')
-  const parent = input.parentElement
-  const error = document.createElement('p')
-  error.textContent = `Błąd`
-  error.classList.add('error-text')
-  parent.append(error)
+// /[A-Za-z0-9]{6,16}/
+const handleError = input => {
+  switch (input.id) {
+    case 'username':
+      if (!input.value) {
+        input.classList.add('error')
+        input.parentElement.querySelector(
+          '.error-text'
+        ).innerHTML = `To pole jest wymagane`
+        return
+      }
+      if (/g/.test(input.value)) {
+        input.classList.add('error')
+        input.parentElement.querySelector
+        '.error-text'.innerHTML = `Pole za krótkie.`
+        return
+      }
+      break
+    case 'email':
+      if (!input.value) {
+        input.classList.add('error')
+        input.parentElement.querySelector(
+          '.error-text'
+        ).innerHTML = `To pole jest wymagane`
+        return
+      }
+      if (!/\w+@\w+.\w+/.test(input.value)) {
+        input.classList.add('error')
+        return (input.parentElement.querySelector(
+          '.error-text'
+        ).innerHTML = `Niewłaściwy mail.`)
+      }
+      break
+    case 'rep_email':
+      if (!input.value) {
+        input.classList.add('error')
+        input.parentElement.querySelector(
+          '.error-text'
+        ).innerHTML = `To pole jest wymagane`
+        return
+      }
+      if (document.querySelector('#email').value !== input.value) {
+        input.classList.add('error')
+        input.parentElement.querySelector(
+          '.error-text'
+        ).innerHTML = `Pola email muszą być takie same.`
+      }
+      break
+  }
 }
 
 const register = () => {
   const inputs = document.querySelectorAll('input')
+
+  //remove old Errors and validate again
   for (let input of inputs) {
     input.classList.remove('error')
+    //last element is error div
+    input.parentElement.lastElementChild.textContent = ''
   }
-  document.querySelectorAll('.error-text').forEach(el => el.remove())
 
   const [username, password, email, rep_email] = inputs
-  if (!username.value) handleError(username.id)
-  if (!password.value) handleError(password.id)
-  if (!email.value) handleError(email.id)
-  if (!rep_email.value) handleError(rep_email.id)
+  handleError(username)
+  handleError(password)
+  handleError(email)
+  handleError(rep_email)
 }
 
 const offlineView = () => {
@@ -75,41 +117,51 @@ const content = view => {
 
   switch (view) {
     case 'register':
-      html = `<form class="form-style" ><span class="action">Rejestracja</span>
-    <div>
+      html = `<form class="form-style">
+      <span class="action">Rejestracja</span>
+    <div class="wrapper">
       <label for="username">Nazwa użytkownika</label>
       <input type="text" id="username" />
+      <div class="error-text"></div>
     </div>
-    <div>
+    <div class="wrapper">
       <label for="password">Hasło</label>
       <input type="password" id="password" />
+      <div class="error-text"></div>
     </div>
-    <div>
-      <label for="mail">Email</label>
-      <input type="text" id="mail" />
+    <div class="wrapper">
+      <label for="email">Email</label>
+      <input type="text" id="email" />
+      <div class="error-text"></div>
+
     </div>
-    <div>
-      <label for="rep_mail">Powtórz email</label>
-      <input type="text" id="rep_mail" />
+    <div class="wrapper">
+      <label for="rep_email">Powtórz email</label>
+      <input type="text" id="rep_email" />
+      <div class="error-text"></div>
+
     </div>
+    <div class="submit-section">
     <button class="btn submit" type="button" onclick="register()">Utwórz konto</button>
       <button class="btn return" id="return" type="button">Powrót</button>
-    </form`
+      </div>
+    </form>`
       break
     case 'login':
       html = `<form class="form-style"><span class="action">Logowanie</span>
-      <div>
+      <div class="wrapper">
         <label for="username">Nazwa użytkownika</label>
         <input type="text" id="username" />
       </div>
-      <div>
+      <div class="wrapper">
         <label for="password">Hasło</label>
         <input type="password" id="password" />
       </div>
-
+    <div class="submit-section">
       <button class="btn submit" type="button">Zaloguj</button>
       <button class="btn return" id="return" type="button">Powrót</button>
-      </form`
+      </div>
+      </form>`
       break
     case 'notification':
       html = `<p class="notif">Zaloguj się, by sprawdzić swoje transakcje.</p>`
