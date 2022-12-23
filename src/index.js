@@ -68,7 +68,6 @@ const handleError = input => {
 
 const register = () => {
   const inputs = document.querySelectorAll('input')
-
   //remove old Errors and validate again
   for (let input of inputs) {
     input.classList.remove('error')
