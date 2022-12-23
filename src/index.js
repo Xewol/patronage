@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })
 // /[A-Za-z0-9]{6,16}/
-const handleError = input => {
+const validate = input => {
   switch (input.id) {
     case 'username':
       if (!input.value) {
@@ -76,10 +76,10 @@ const register = () => {
   }
 
   const [username, password, email, rep_email] = inputs
-  handleError(username)
-  handleError(password)
-  handleError(email)
-  handleError(rep_email)
+  validate(username)
+  validate(password)
+  validate(email)
+  validate(rep_email)
 }
 
 const offlineView = () => {
