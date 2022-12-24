@@ -3,8 +3,10 @@
   --primary: #3399cc;
   --secondary: #66c2e0;
   --tertiary: #99e6f2;
+  --tertiary-dark: #5f9099;
   --quaternary: #cce8f5;
-  --quaternary-dark: rgb(77, 86, 90);
+  --quaternary-dark: #4d565a;
+  --error: #a85050;
 
 }
 
@@ -90,7 +92,15 @@ header{
 .login{
   border: 2px solid var(--primary);
   box-shadow: 0 4px 12px -4px var(--primary)
+}
 
+.logout{
+  border: 2px solid var(--tertiary-dark);
+  box-shadow: 0 4px 12px -4px var(--tertiary-dark)
+}
+.logout:hover{
+  background: var(--tertiary-dark);
+  color:black;
 }
 
 .hidden{
@@ -157,8 +167,6 @@ header{
   color: var(--quaternary);
   font-size: 2rem;
   padding-left: 0.5rem;
-  transition-property: border-color;
-  transition-duration: 500ms;
   border-color: rgb(47, 45, 45);
 }
 .form-style label{
@@ -200,18 +208,15 @@ header{
   background-color: rgba(204, 232, 245, .80);
 }
 
-/* !important to override previous .form-style input */
 .error{
- border-left-width: 1rem !important;
-  border-color: red !important;
-
+  border-color: var(--error) !important;
 }
 .error-text{
   display: inline-block;
   height: 1rem;
   font-size: 0.8rem;
   font-weight: bold;
-  color:red;
+  color:var(--error);
 }
 
 
