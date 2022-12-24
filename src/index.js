@@ -106,7 +106,8 @@ const login = event => {
   const hashedPassword = btoa(password.value)
   //if no errors
   if (!inputs.some(el => el.classList.contains('error'))) {
-    const db = JSON.parse(localStorage.db)
+    const db = localStorage.db ? JSON.parse(localStorage.db) : undefined
+    //TODO change -> first login can be undefined what then ??
     if (db) {
       let foundUser = db.find(el => el.email === email.value)
       //email is valid but user not found so we suggest making account
@@ -160,7 +161,7 @@ const register = event => {
 
   //if no errors
   if (!inputs.some(el => el.classList.contains('error'))) {
-    const db = JSON.parse(localStorage.db)
+    const db = localStorage.db ? JSON.parse(localStorage.db) : undefined
     if (db) {
       //find if email is in use
       let foundUser = db.find(el => el.email === email.value)
