@@ -1,4 +1,5 @@
 'use strict'
+
 //TODO load from storage
 const authroize = () => {
   if (!localStorage.session) return undefined
@@ -104,41 +105,42 @@ const login = event => {
   validate(password)
 
   const hashedPassword = btoa(password.value)
-  //if no errors
-  if (!inputs.some(el => el.classList.contains('error'))) {
-    const db = localStorage.db ? JSON.parse(localStorage.db) : undefined
-    //TODO change -> first login can be undefined what then ??
-    if (db) {
-      let foundUser = db.find(el => el.email === email.value)
-      //email is valid but user not found so we suggest making account
-      if (!foundUser) {
-        const app = document.querySelector('#app')
-        app.innerHTML = view('emailNotTaken')
-        const [accept, decline] = app.querySelectorAll('button')
-        accept.addEventListener('click', () => {
-          app.innerHTML = view('register')
-          app.querySelector('#email').value = email.value
-          app.querySelector('#password').value = password.value
-        })
-        decline.addEventListener('click', () => {
-          app.innerHTML = view('login')
-          document.querySelector('#return').addEventListener('click', () => {
-            app.innerHTML = currentUser ? view('online') : view('offline')
-            const buttons = document.querySelector('.btn-wrapper').children
-            for (let button of buttons) {
-              button.classList.remove('hidden')
-            }
-          })
-        })
-      }
-      if (foundUser && foundUser.password !== hashedPassword) {
-        setError(document.querySelector('#email'), 'Błędny email lub hasło')
-        setError(document.querySelector('#password'), 'Błędny email lub hasło')
-        return
-      }
-    }
-    signInUser({ email: email.value, password: hashedPassword })
+  //if errors return
+  if (inputs.some(el => el.classList.contains('error'))) return
+
+  //intialize empty db if there is none
+  const db = localStorage.db ? JSON.parse(localStorage.db) : []
+  let foundUser = db.find(el => el.email === email.value)
+
+  //email is valid but user not found so we suggest making account
+  if (!foundUser) {
+    const app = document.querySelector('#app')
+    app.innerHTML = view('emailNotTaken')
+    const [accept, decline] = app.querySelectorAll('button')
+    accept.addEventListener('click', () => {
+      app.innerHTML = view('register')
+      app.querySelector('#email').value = email.value
+      app.querySelector('#password').value = password.value
+    })
+    decline.addEventListener('click', () => {
+      app.innerHTML = view('login')
+      document.querySelector('#return').addEventListener('click', () => {
+        app.innerHTML = currentUser ? view('online') : view('offline')
+        const buttons = document.querySelector('.btn-wrapper').children
+        for (let button of buttons) {
+          button.classList.remove('hidden')
+        }
+      })
+    })
+    return
   }
+
+  if (foundUser && foundUser.password !== hashedPassword) {
+    setError(document.querySelector('#email'), 'Błędny email lub hasło')
+    setError(document.querySelector('#password'), 'Błędny email lub hasło')
+    return
+  }
+  signInUser({ email: email.value, password: hashedPassword })
 }
 
 const register = event => {
@@ -159,29 +161,28 @@ const register = event => {
   validate(email)
   validate(rep_email)
 
-  //if no errors
-  if (!inputs.some(el => el.classList.contains('error'))) {
-    const db = localStorage.db ? JSON.parse(localStorage.db) : undefined
-    if (db) {
-      //find if email is in use
-      let foundUser = db.find(el => el.email === email.value)
-      if (foundUser) return setError(email, 'Email jest już w użyciu.')
+  //if errors return
+  if (inputs.some(el => el.classList.contains('error'))) return
 
-      //find if username is in use
-      foundUser = db.find(el => el.username === username.value)
-      if (foundUser) return setError(username, 'Nazwa użytkownika jest zajęta')
-    }
+  //intialize empty db if there is none
+  const db = localStorage.db ? JSON.parse(localStorage.db) : []
 
-    //email and username are not used, finalize user creation
-    createUser({
-      id: crypto.randomUUID(),
-      username: username.value,
-      password: btoa(password.value),
-      email: email.value,
-    })
-  }
+  //find if email is in use
+  let foundUser = db.find(el => el.email === email.value)
+  if (foundUser) return setError(email, 'Email jest już w użyciu.')
+
+  //find if username is in use
+  foundUser = db.find(el => el.username === username.value)
+  if (foundUser) return setError(username, 'Nazwa użytkownika jest zajęta')
+
+  //email and username are not used, finalize user creation
+  createUser({
+    id: crypto.randomUUID(),
+    username: username.value,
+    password: btoa(password.value),
+    email: email.value,
+  })
 }
-
 const offlineView = () => {
   const app = document.querySelector('#app')
   app.innerHTML = view('offline')
@@ -270,6 +271,7 @@ const onlineView = async () => {
       ],
     },
     options: {
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           labels: {
@@ -340,6 +342,7 @@ const onlineView = async () => {
       ],
     },
     options: {
+      maintainAspectRatio: false,
       legend: {
         position: 'right',
       },
@@ -365,6 +368,17 @@ const onlineView = async () => {
       },
     },
   })
+
+  const transactionList = document.querySelector('#transactions')
+
+  for (let transaction of transactions) {
+    const div = document.createElement('div')
+    div.className = 'transaction'
+    div.innerHTML = `
+    <div><span>${transaction.date}</span><span>ikona</span></div>
+    <p>Opis: ${transaction.description}</p><span>Kwota: ${transaction.amount} zł</span><span>Obecne saldo: ${transaction.balance} zł</span>`
+    transactionList.appendChild(div)
+  }
 }
 
 /**
@@ -442,7 +456,8 @@ const view = content => {
           <canvas id="doughnut-chart" class="doughnut"></canvas>
         </div>
       </div>
-      <div>Transakcje</div>
+      <div id="transactions" class="transaction-list-section">
+      </div>
     </div>`
       break
 
