@@ -375,8 +375,13 @@ const onlineView = async () => {
     const div = document.createElement('div')
     div.className = 'transaction'
     div.innerHTML = `
-    <div><span>${transaction.date}</span><span>ikona</span></div>
-    <p>Opis: ${transaction.description}</p><span>Kwota: ${transaction.amount} zł</span><span>Obecne saldo: ${transaction.balance} zł</span>`
+    <div class="title"><span>${transaction.date}</span><span>ikona</span></div>
+    <div class="details"><span>Kwota transakcji: ${
+      transaction.amount
+    } zł</span><span>Saldo po transakcji: ${transaction.balance} zł</span></div>
+    <div><span>Opis: ${transaction.description}<span></div>
+    <div>Typ transakcji: ${transactionTypes[transaction.type - 1][1]}</div>
+    `
     transactionList.appendChild(div)
   }
 }
@@ -456,7 +461,19 @@ const view = content => {
           <canvas id="doughnut-chart" class="doughnut"></canvas>
         </div>
       </div>
-      <div id="transactions" class="transaction-list-section">
+      <div class="transaction-list-section">
+      <div class="flex-section">
+      <div style="margin-bottom:0.5rem;">Historia transakcji</div>
+      <div id="transactions" class="transaction-wrapper"></div>
+      </div>
+      <div class="flex-section-sm">
+      <div class=" filtr-wrapper">
+      <div style="margin-bottom:0.5rem;">Filtruj</div>
+        <div class="filter">
+        
+        </div>
+      </div>
+      </div>
       </div>
     </div>`
       break
