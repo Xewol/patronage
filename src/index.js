@@ -487,7 +487,7 @@ const view = content => {
 
     </div>
     <div class="submit-section">
-    <button class="btn submit" >Utwórz konto</button>
+    <button class="btn submit" >Zarejestruj</button>
       <button class="btn return" id="return" type="button">Powrót</button>
       </div>
     </form>`
