@@ -436,7 +436,7 @@ const onlineView = async () => {
     },
   })
 
-  const transactionList = document.querySelector('.transactions')
+  const transactionList = document.querySelector('#transactions')
 
   for (let transaction of transactions) {
     const div = document.createElement('div')
@@ -529,21 +529,18 @@ const view = content => {
       </div>
       <div class="transaction-list-section">
           <div class="flex-section">
-            <div style="margin-bottom:0.5rem;">Historia transakcji</div>
-            <div class="transaction-wrapper">
-              <div class="transaction sticky">
-                <div class="item">Data</div>
-                <div class="item">Typ transakcji</div>
-                <div class="item">Opis</div>
-                <div class="item">Kwota</div>
-                <div class="item">Saldo</div>
-              </div>
-              <div class="transactions"></div>
+            <div class="legend">
+              <div class="item">Data</div>
+              <div class="item">Typ transakcji</div>
+              <div class="item">Opis</div>
+              <div class="item">Kwota</div>
+              <div class="item">Saldo</div>
+            </div>
+            <div id="transactions" class="transaction-wrapper">
           </div>
       </div>
       <div class="flex-section-sm">
         <div class=" filtr-wrapper">
-          <div style="margin-bottom:0.5rem;">Filtruj</div>
           <div class="filter"></div>
         </div>
       </div>

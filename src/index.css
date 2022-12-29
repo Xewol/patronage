@@ -266,25 +266,33 @@ header{
 .transaction-list-section{
   margin-top: 1rem;
   width: 100%;
-  height: 100%;
+  height: 35vh;
   display: flex;
+  
 }
 .transaction-wrapper{
   width: 100%;
-  border: 1px solid var(--quaternary-dark);
   border-radius: 0.375rem;
+  height: 100%;
+  overflow-y: auto;
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
   box-shadow: 0 8px 12px -6px var(--quaternary-dark);
+
 }
 
 .flex-section{
   display:flex;
   flex-direction:column;
   width:60%;
+  height: 100%;
 }
 .flex-section-sm{
   display:flex;
   flex-direction:column;
   width:40%;
+  height: 100%;
 }
 
 .filtr-wrapper{
@@ -318,7 +326,8 @@ header{
 }
 
 
-.transaction .item{
+
+ .item{
   width: 20%;
   display: flex;
   justify-content: center;
@@ -326,6 +335,17 @@ header{
   align-items: center;
   text-align: center;
 }
+
+.legend{
+  display: flex;
+  padding: 0.5;
+  align-items: center;
+  border: 1px solid var(--quaternary-dark);
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+}
+
+
 .transaction .item span{
 overflow: hidden;
 text-overflow: ellipsis;
@@ -342,19 +362,12 @@ font-size: smaller;
 }
 
 
-.transactions{
-  display: flex;
-  overflow-y: auto;
-  flex-direction: column;
-  height: 100%;
-  max-height: 30vh;
-  border-bottom-left-radius: 0.250rem;
-}
 
-.transactions .transaction:nth-child(odd){
+
+.transaction-wrapper .transaction:nth-child(odd){
   background-color: var(--quaternary-dark);
 }
-.transactions .transaction:nth-child(even){
+.transaction-wrapper .transaction:nth-child(even){
   background-color: var(--quaternary-lighter-dark);
 }
 
@@ -363,7 +376,7 @@ font-size: smaller;
 ::-webkit-scrollbar{
   width: 0.6rem;
   background: var(--quaternary-dark);
-  border-bottom-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.375rem;
  }
  
  ::-webkit-scrollbar-thumb{
