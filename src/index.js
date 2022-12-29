@@ -223,15 +223,82 @@ const onlineView = async () => {
   app.innerHTML = view('online')
   const ctx1 = document.getElementById('bar-chart')
   const ctx2 = document.getElementById('doughnut-chart')
-  const data = await fetch(
-    'https://api.jsonbin.io/v3/b/63a092ab15ab31599e2045be',
-    {
-      headers: {
-        'x-access-key':
-          '$2b$10$5pBRUbFRKdKft/b8qSQ3IeyPQgQ8CLXlvgoQA6GdpYvdWva.pOfGS',
+
+  //28.12.2022 Requests exhausted.
+
+  // const data = await fetch(
+  //   'https://api.jsonbin.io/v3/b/63a092ab15ab31599e2045be',
+  //   {
+  //     headers: {
+  //       'x-access-key':
+  //         '$2b$10$5pBRUbFRKdKft/b8qSQ3IeyPQgQ8CLXlvgoQA6GdpYvdWva.pOfGS',
+  //     },
+  //   }
+  // ).then(res => res.json())
+
+  const jsonDummy = {
+    meta: {},
+    record: {
+      transacationTypes: {
+        1: 'Wpływy - inne',
+        2: 'Wydatki - zakupy',
+        3: 'Wpływy - wynagrodzenie',
+        4: 'Wydatki - inne',
       },
-    }
-  ).then(res => res.json())
+      transactions: [
+        {
+          date: '2022-11-12',
+          amount: -231.56,
+          description: 'Biedronka 13',
+          balance: 4337.25,
+          type: 2,
+        },
+        {
+          date: '2022-11-12',
+          amount: -31.56,
+          description: 'PayU Spółka Akcyjna',
+          balance: 4572.18,
+          type: 4,
+        },
+        {
+          date: '2022-11-12',
+          amount: 2137.69,
+          description: 'Wynagrodzenie z tytułu Umowy o Pracę',
+          balance: 2420.47,
+          type: 3,
+        },
+        {
+          date: '2022-11-10',
+          amount: -136,
+          description: 'Lidl',
+          balance: 2555.55,
+          type: 2,
+        },
+        {
+          date: '2022-11-10',
+          amount: 25,
+          description: 'Zrzutka na prezent dla Grażyny',
+          balance: 2847.66,
+          type: 1,
+        },
+        {
+          date: '2022-11-09',
+          amount: -111.11,
+          description: 'Biedronka 13',
+          balance: 3000,
+          type: 2,
+        },
+        {
+          date: '2022-11-09',
+          amount: -78.33,
+          description: 'PayU Spółka Akcyjna',
+          balance: 3027.51,
+          type: 4,
+        },
+      ],
+    },
+  }
+  const data = jsonDummy
   console.log(data)
   const transactions = data.record.transactions
   const transactionTypes = Object.entries(data.record.transacationTypes)
@@ -369,18 +436,17 @@ const onlineView = async () => {
     },
   })
 
-  const transactionList = document.querySelector('#transactions')
+  const transactionList = document.querySelector('.transactions')
 
   for (let transaction of transactions) {
     const div = document.createElement('div')
     div.className = 'transaction'
     div.innerHTML = `
-    <div class="title"><span>${transaction.date}</span><span>ikona</span></div>
-    <div class="details"><span>Kwota transakcji: ${
-      transaction.amount
-    } zł</span><span>Saldo po transakcji: ${transaction.balance} zł</span></div>
-    <div><span>Opis: ${transaction.description}<span></div>
-    <div>Typ transakcji: ${transactionTypes[transaction.type - 1][1]}</div>
+  <div class="item"><span>${transaction.date}</span></div>
+  <div class="item">ikona</div>
+  <div class="item"><span>${transaction.description}</span></div>
+  <div class="item"><span>${transaction.amount} zł</span></div>
+  <div class="item"><span>${transaction.balance} zł</span></div>
     `
     transactionList.appendChild(div)
   }
@@ -462,17 +528,24 @@ const view = content => {
         </div>
       </div>
       <div class="transaction-list-section">
-      <div class="flex-section">
-      <div style="margin-bottom:0.5rem;">Historia transakcji</div>
-      <div id="transactions" class="transaction-wrapper"></div>
+          <div class="flex-section">
+            <div style="margin-bottom:0.5rem;">Historia transakcji</div>
+            <div class="transaction-wrapper">
+              <div class="transaction sticky">
+                <div class="item">Data</div>
+                <div class="item">Typ transakcji</div>
+                <div class="item">Opis</div>
+                <div class="item">Kwota</div>
+                <div class="item">Saldo</div>
+              </div>
+              <div class="transactions"></div>
+          </div>
       </div>
       <div class="flex-section-sm">
-      <div class=" filtr-wrapper">
-      <div style="margin-bottom:0.5rem;">Filtruj</div>
-        <div class="filter">
-        
+        <div class=" filtr-wrapper">
+          <div style="margin-bottom:0.5rem;">Filtruj</div>
+          <div class="filter"></div>
         </div>
-      </div>
       </div>
       </div>
     </div>`
