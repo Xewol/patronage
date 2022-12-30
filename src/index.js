@@ -540,8 +540,10 @@ const view = content => {
           </div>
       </div>
       <div class="flex-section-sm">
-        <div class=" filtr-wrapper">
-          <div class="filter"></div>
+        <div class="filter-wrapper">
+          <div class="filter">
+          <input type="search"></input>
+          </div>
         </div>
       </div>
       </div>
