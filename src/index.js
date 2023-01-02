@@ -216,6 +216,16 @@ const logout = () => {
   offlineView()
 }
 
+const swap = () => {
+  const charts = document.querySelectorAll('[data-active]')
+
+  charts.forEach(
+    chart =>
+      (chart.dataset.active =
+        chart.dataset.active === 'true' ? 'false' : 'true')
+  )
+}
+
 const onlineView = async () => {
   const app = document.querySelector('#app')
   const actionBtns = document.querySelector('.btn-wrapper')
@@ -437,18 +447,66 @@ const onlineView = async () => {
   })
 
   const transactionList = document.querySelector('#transactions')
-
+  const transactionListMobile = document.querySelector('#transactionsMobile')
   for (let transaction of transactions) {
     const div = document.createElement('div')
     div.className = 'transaction'
     div.innerHTML = `
-  <div class="item"><span>${transaction.date}</span></div>
+  <div class="item">${transaction.date}</div>
   <div class="item">ikona</div>
-  <div class="item"><span>${transaction.description}</span></div>
-  <div class="item"><span>${transaction.amount} zł</span></div>
-  <div class="item"><span>${transaction.balance} zł</span></div>
+  <div class="item description">${transaction.description} <div class="type"> ${
+      transactionTypes[transaction.type - 1][1]
+    }</div></div>
+  <div class="item">${transaction.amount} zł</div>
+  <div class="item">${transaction.balance} zł</div>
+  <div class="item description">
+    <div>Numer karty</div>
+    <div>Zbliżeniowo/Blik</div>
+  </div> 
     `
     transactionList.appendChild(div)
+
+    const wrapper = document.createElement('div')
+
+    const expandDiv = document.createElement('div')
+    expandDiv.ariaExpanded = 'false'
+    expandDiv.innerHTML = `
+    <div class="heading"><div>Data: ${
+      transaction.date
+    }</div><div>Kwota transakcji: ${transaction.amount} zł</div></div>
+    <div> Saldo przed transakcją: ${transaction.balance}</div>
+    <div>Opis: ${transaction.description}</div>
+    <div>Typ: ${transactionTypes[transaction.type - 1][1]}</div>
+    `
+    expandDiv.className = 'transaction-details'
+
+    const button = document.createElement('button')
+    button.className = 'transaction'
+    button.onclick = () => {
+      const isExpanded = document.querySelector('[aria-expanded="true"]')
+
+      //check if there is any expanded div and if
+      //other transaction is clicked than this one
+      //this is done so i can close expanded div when clicked again on transaction
+      if (isExpanded && expandDiv.ariaExpanded === 'false')
+        isExpanded.ariaExpanded = 'false'
+
+      expandDiv.ariaExpanded =
+        expandDiv.ariaExpanded === 'true' ? 'false' : 'true'
+      if (expandDiv.ariaExpanded === 'true')
+        expandDiv.scrollIntoView({
+          behavior: 'smooth',
+        })
+    }
+    button.innerHTML = `
+    <div class="item">ikona</div>
+    <div class="item">${transaction.description}</div>
+    <div class="item">${transaction.amount} zł</div>
+    `
+
+    wrapper.append(button, expandDiv)
+
+    transactionListMobile.appendChild(wrapper)
   }
 }
 
@@ -519,34 +577,40 @@ const view = content => {
 
     case 'online':
       html = `<div class="main-section">
-      <div class="charts">
-        <div class="chart-wrapper">
+      <div class="charts" id="bars">
+      <button class="navigation" onclick="swap()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" ><path fill="currentColor" d="M9.4 278.6c-12.5-12.5-12.5-32.8 0-45.3l128-128c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-128-128z"/></svg>
+      </button>
+        <div class="chart-wrapper" data-active="true">
           <canvas id="bar-chart" class="bars"></canvas>
         </div>
-        <div class="chart-wrapper">
+        <div class="chart-wrapper" data-active="false">
           <canvas id="doughnut-chart" class="doughnut"></canvas>
         </div>
+      <button class="navigation"onclick="swap()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path fill="currentColor" d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z"/></svg>
+      </button>
+
       </div>
       <div class="transaction-list-section">
           <div class="flex-section">
-            <div class="legend">
+            <div class="legend desktop-grid">
               <div class="item">Data</div>
+              <div class="item">Typ transakcji</div>
+              <div class="item"">Opis</div>
+              <div class="item">Kwota</div>
+              <div class="item">Saldo</div>
+              <div class="item">Metoda płatności</div>
+            </div>
+            <div class="legend mobile">
               <div class="item">Typ transakcji</div>
               <div class="item">Opis</div>
               <div class="item">Kwota</div>
-              <div class="item">Saldo</div>
             </div>
-            <div id="transactions" class="transaction-wrapper">
-          </div>
-      </div>
-      <div class="flex-section-sm">
-        <div class="filter-wrapper">
-          <div class="filter">
-          <input type="search"></input>
+            <div id="transactions" class="transaction-wrapper desktop-block"></div>
+            <div id="transactionsMobile" class="transaction-wrapper mobile"></div>
           </div>
         </div>
-      </div>
-      </div>
     </div>`
       break
 
