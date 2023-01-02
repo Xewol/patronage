@@ -161,7 +161,11 @@ header{
   
 }
 
-
+.icon{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .form-style input{
   background: transparent;
