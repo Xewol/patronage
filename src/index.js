@@ -469,10 +469,10 @@ const onlineView = async () => {
     const expandDiv = document.createElement('div')
     expandDiv.ariaExpanded = 'false'
     expandDiv.innerHTML = `
-    <div class="heading"><div>Data: ${
+    <div class="row"><div>Data: ${
       transaction.date
     }</div><div>Kwota transakcji: ${transaction.amount} zł</div></div>
-    <div> Saldo przed transakcją: ${transaction.balance}</div>
+    <div> Saldo przed transakcją: ${transaction.balance} zł</div>
     <div>Opis: ${transaction.description}</div>
     <div>Typ: ${transactionTypes[transaction.type - 1][1]}</div>
     `
@@ -492,8 +492,9 @@ const onlineView = async () => {
       expandDiv.ariaExpanded =
         expandDiv.ariaExpanded === 'true' ? 'false' : 'true'
       if (expandDiv.ariaExpanded === 'true')
-        expandDiv.scrollIntoView({
+        button.scrollIntoView({
           behavior: 'smooth',
+          block: 'start',
         })
     }
     button.innerHTML = `
@@ -502,8 +503,7 @@ const onlineView = async () => {
     <div class="item">${transaction.amount} zł</div>
     `
 
-    transactionListMobile.appendChild(button)
-    transactionListMobile.appendChild(expandDiv)
+    transactionListMobile.append(button, expandDiv)
   }
 }
 
@@ -556,7 +556,7 @@ const view = content => {
 
     </div>
     <div class="wrapper">
-      <label for="rep_email">Powtórz email</label>
+      <label for="rep_email">Potwierdź email</label>
       <input type="text" id="rep_email" />
       <div class="error-text"></div>
 
@@ -571,7 +571,7 @@ const view = content => {
       html = `<form class="form-style" onsubmit="login(event)">
       <span class="action">Logowanie</span>
       <div class="wrapper">
-        <label for="email">Email</label>
+        <label for="email">Nazwa użytkownika / Email</label>
         <input type="text" id="email" />
       <div class="error-text"></div>
 
@@ -594,7 +594,7 @@ const view = content => {
 
     case 'online':
       html = `<div class="main-section">
-      <div class="charts" id="bars">
+      <section class="charts" id="bars">
       <button class="navigation" onclick="swap()">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" ><path fill="currentColor" d="M9.4 278.6c-12.5-12.5-12.5-32.8 0-45.3l128-128c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-128-128z"/></svg>
       </button>
@@ -608,26 +608,13 @@ const view = content => {
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path fill="currentColor" d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z"/></svg>
       </button>
 
-      </div>
-      <div class="transaction-list-section">
+      </section>
+      <section class="transaction-list-section">
           <div class="flex-section">
-            <div class="legend desktop-grid">
-              <div class="item">Data</div>
-              <div class="item">Typ transakcji</div>
-              <div class="item"">Opis</div>
-              <div class="item">Kwota</div>
-              <div class="item">Saldo</div>
-              <div class="item">Metoda płatności</div>
-            </div>
-            <div class="legend mobile">
-              <div class="item">Typ transakcji</div>
-              <div class="item">Opis</div>
-              <div class="item">Kwota</div>
-            </div>
             <div id="transactions" class="transaction-wrapper desktop-block"></div>
             <div id="transactionsMobile" class="transaction-wrapper mobile"></div>
           </div>
-        </div>
+        </section>
     </div>`
       break
 
