@@ -1,0 +1,13 @@
+1. Responsywność [x]
+2. Nawigacja klawiaturą [x]
+3. Hash password [x]
+4. Walidacja nazwy (-_[]\/, 5 liter, 1 cyfra)
+5. Alias email
+6. Regexp [x]
+7. Historia transakcji
+    a) pogrupowanie według daty
+    b) filtrowanie
+8. Wykres słupokowy 
+9. Własne zestawy
+10. SPA [x]
+11. Interfejs językowy
