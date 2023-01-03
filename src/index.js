@@ -484,7 +484,7 @@ const onlineView = async () => {
       const isExpanded = document.querySelector('[aria-expanded="true"]')
 
       //check if there is any expanded div and if
-      //other transaction is clicked than this one
+      //other that this transaction is clicked
       //this is done so i can close expanded div when clicked again on transaction
       if (isExpanded && expandDiv.ariaExpanded === 'false')
         isExpanded.ariaExpanded = 'false'
