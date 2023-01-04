@@ -1,24 +1,84 @@
 'use strict'
 
-//TODO load from storage
-const authroize = () => {
-  if (!localStorage.session) return undefined
+//first check localStorage
+let currentLang = localStorage.language ?? document.documentElement.lang
 
-  return localStorage.session
+const changeLanguage = () => {
+  currentLang = currentLang === 'pl' ? 'en' : 'pl'
+  document.querySelector('#language').textContent = currentLang?.toUpperCase()
+  localStorage.language = currentLang
+  if (localStorage.session) {
+    return onlineView()
+  }
+  offlineView()
 }
 
-//! USER DATA
-let currentUser = authroize()
+const languageObject = {
+  pl: {
+    button: {
+      register: 'Rejestracja',
+      login: 'Logowanie',
+      logout: 'Wyloguj',
+      return: 'Powrót',
+      createAccount: 'Zarejestruj',
+      signIn: 'Zaloguj',
+    },
+    form: {
+      field: 'Nazwa użytkownika / Email',
+      username: 'Nazwa użytkownika',
+      password: 'Hasło',
+      email: 'Email',
+      confirm: 'Potwierdź email',
+      actionLogin: 'Logowanie',
+      actionRegister: 'Rejestracja',
+      emailFree1:
+        'Podany email jest poprawny, ale nie występuje w naszej bazie danych.',
+      emailFree2: 'Czy chesz stworzyć nowe konto na jego podstawie ?',
+      accept: 'Tak',
+      decline: 'Nie',
+    },
+    notification: 'Zaloguj się, by sprawdzić swoje transakcje.',
+  },
+  en: {
+    button: {
+      register: 'Register',
+      login: 'Login',
+      logout: 'Logout',
+      return: 'Back',
+      createAccount: 'Register',
+      signIn: 'Sign in',
+    },
+    form: {
+      field: 'Username / Email',
+      username: 'Username',
+      password: 'Password',
+      email: 'Email',
+      confirm: 'Confirm email',
+      actionLogin: 'Login',
+      actionRegister: 'Register',
+      emailFree1:
+        'The e-mail address provided is correct, but it is not in our database.',
+      emailFree2: 'Would you like to create new account ?',
+      accept: 'Yes',
+      decline: 'No',
+    },
+    notification: 'You need to be signed in to view your transactions.',
+  },
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (!currentUser) {
-    offlineView()
-  } else onlineView()
+  const langBtn = document.querySelector('#language')
+  langBtn.textContent = currentLang.toUpperCase()
+  langBtn.onclick = changeLanguage
+  if (localStorage.session) {
+    return onlineView()
+  }
+  offlineView()
 })
 
 const setError = (input, msg) => {
   input.classList.add('error')
-  input.parentElement.querySelector('.error-text').innerHTML = msg
+  input.parentElement.querySelector('.error-text').textContent = msg
 }
 
 const validate = input => {
@@ -63,17 +123,6 @@ const validate = input => {
   }
 }
 
-const signInUser = userObj => {
-  const db = JSON.parse(localStorage.db)
-  const foundUser = db.find(
-    user => user.email === userObj.email && user.password === userObj.password
-  )
-  if (foundUser) {
-    localStorage.session = foundUser.id
-    onlineView()
-  }
-}
-
 const createUser = userObj => {
   //localstorage.db also possible
   const database = localStorage.getItem('db')
@@ -83,7 +132,7 @@ const createUser = userObj => {
   //if not just create new array with user inside
   else localStorage.db = JSON.stringify([userObj])
 
-  //login user
+  //sign in user
   localStorage.setItem('session', userObj.id)
 
   onlineView()
@@ -91,69 +140,88 @@ const createUser = userObj => {
 
 const login = event => {
   event.preventDefault()
-  //creating array so i can use Array.some later
+  //spread to array so i can use Array.some later
   const inputs = Array(...document.querySelectorAll('input'))
-  //remove old Errors and validate again
+
+  //clear errors before validation ,
+  //because someone might only given wrong password
+  //and both inputs are error for safety reason
   inputs.forEach(el => {
     el.classList.remove('error')
-    //last element is error div
     el.parentElement.lastElementChild.textContent = ''
   })
 
-  const [email, password] = inputs
-  validate(email)
+  const [field, password] = inputs
+  validate(field)
   validate(password)
 
-  const hashedPassword = btoa(password.value)
   //if errors return
   if (inputs.some(el => el.classList.contains('error'))) return
 
+  const hashedPassword = btoa(password.value)
+
   //intialize empty db if there is none
   const db = localStorage.db ? JSON.parse(localStorage.db) : []
-  let foundUser = db.find(el => el.email === email.value)
 
-  //email is valid but user not found so we suggest making account
-  if (!foundUser) {
+  //check if field is username or email value
+  const isValidEmail = /\w+@\w+.\w+/.test(field.value)
+
+  let foundUser = isValidEmail
+    ? db.find(el => el.email === field.value)
+    : db.find(el => el.username === field.value)
+
+  //email is valid but user was not found so we suggest making account
+  if (!foundUser && isValidEmail) {
     const app = document.querySelector('#app')
     app.innerHTML = view('emailNotTaken')
     const [accept, decline] = app.querySelectorAll('button')
     accept.addEventListener('click', () => {
       app.innerHTML = view('register')
-      app.querySelector('#email').value = email.value
+      app.querySelector('#email').value = field.value
       app.querySelector('#password').value = password.value
+      app
+        .querySelectorAll('input')
+        .forEach(input => input.addEventListener('input', onInput))
     })
     decline.addEventListener('click', () => {
       app.innerHTML = view('login')
+      app
+        .querySelectorAll('input')
+        .forEach(input => input.addEventListener('input', onInput))
       document.querySelector('#return').addEventListener('click', () => {
-        app.innerHTML = currentUser ? view('online') : view('offline')
-        const buttons = document.querySelector('.btn-wrapper').children
-        for (let button of buttons) {
-          button.classList.remove('hidden')
-        }
+        offlineView()
+        document.querySelector('#language').classList.remove('hidden')
       })
     })
     return
   }
+  if (!foundUser) {
+    setError(
+      document.querySelector('#field'),
+      'Błędna nazwa użytkownika lub hasło.'
+    )
+    setError(
+      document.querySelector('#password'),
+      'Błędna nazwa użytkownika lub hasło.'
+    )
+    return
+  }
 
   if (foundUser && foundUser.password !== hashedPassword) {
-    setError(document.querySelector('#email'), 'Błędny email lub hasło')
+    setError(document.querySelector('#field'), 'Błędny email lub hasło')
     setError(document.querySelector('#password'), 'Błędny email lub hasło')
     return
   }
-  signInUser({ email: email.value, password: hashedPassword })
+
+  //sign in user
+  localStorage.setItem('session', foundUser.id)
+  onlineView()
 }
 
 const register = event => {
   event.preventDefault()
-  //TODO MAYBE ON CHANGE REMOVE ?
-  //creating array so i can use Array.some later
+  //creating array so i can use Array.some
   const inputs = Array(...document.querySelectorAll('input'))
-  //remove old Errors and validate again
-  inputs.forEach(el => {
-    el.classList.remove('error')
-    //last element is error div
-    el.parentElement.lastElementChild.textContent = ''
-  })
 
   const [username, password, email, rep_email] = inputs
   validate(username)
@@ -183,12 +251,18 @@ const register = event => {
     email: email.value,
   })
 }
+
+const onInput = e => {
+  e.target.classList.remove('error')
+  e.target.parentElement.lastElementChild.textContent = ''
+}
+
 const offlineView = () => {
   const app = document.querySelector('#app')
   app.innerHTML = view('offline')
   const actionBtns = document.querySelector('.btn-wrapper')
-  actionBtns.innerHTML = `<button class="btn login" id="login">Zaloguj</button>
-  <button class="btn register" id="register">Rejestracja</button>`
+  actionBtns.innerHTML = `<button class="btn login" id="login">${languageObject[currentLang].button.login}</button>
+  <button class="btn register" id="register">${languageObject[currentLang].button.register}</button>`
 
   for (let button of actionBtns.childNodes) {
     button.addEventListener('click', () => {
@@ -196,16 +270,22 @@ const offlineView = () => {
       for (let btn of actionBtns.children) {
         btn.classList.remove('hidden')
       }
+      //also remove language changer button
+      document.querySelector('#language').classList.add('hidden')
 
       app.innerHTML = view(button.id)
+
+      //remove errors on input
+      app
+        .querySelectorAll('input')
+        .forEach(input => input.addEventListener('input', onInput))
 
       //hide buttons when form is on
       button.classList.add('hidden')
 
       document.querySelector('#return').addEventListener('click', () => {
-        app.innerHTML = currentUser ? view('online') : view('offline')
-        //unhide buttons when form is off
-        button.classList.remove('hidden')
+        offlineView()
+        document.querySelector('#language').classList.remove('hidden')
       })
     })
   }
@@ -218,7 +298,6 @@ const logout = () => {
 
 const swap = () => {
   const charts = document.querySelectorAll('[data-active]')
-
   charts.forEach(
     chart =>
       (chart.dataset.active =
@@ -229,7 +308,8 @@ const swap = () => {
 const onlineView = async () => {
   const app = document.querySelector('#app')
   const actionBtns = document.querySelector('.btn-wrapper')
-  actionBtns.innerHTML = `<button class="btn logout" onclick="logout()">Wyloguj</button>`
+  document.querySelector('#language').classList.remove('hidden')
+  actionBtns.innerHTML = `<button class="btn logout" onclick="logout()">${languageObject[currentLang].button.logout}</button>`
   app.innerHTML = view('online')
   const ctx1 = document.getElementById('bar-chart')
   const ctx2 = document.getElementById('doughnut-chart')
@@ -306,10 +386,10 @@ const onlineView = async () => {
           type: 4,
         },
       ],
+      cardNumber: generateCardNumber(),
     },
   }
   const data = jsonDummy
-  console.log(data)
   const transactions = data.record.transactions
   const transactionTypes = Object.entries(data.record.transacationTypes)
   //spread back to array so i can .reverse(), because days are descending
@@ -342,8 +422,7 @@ const onlineView = async () => {
           label: 'Saldo na koniec dnia',
           data: saldo,
           borderRadius: 4,
-          backgroundColor: '#4682B4',
-          hoverBackgroundColor: '#203c54',
+          backgroundColor: ctx => (ctx.raw > 0 ? '#00b176' : '#c73c3e'),
         },
       ],
     },
@@ -361,9 +440,13 @@ const onlineView = async () => {
           title: {
             display: true,
             text: 'Saldo',
+            color: textColor,
           },
           grid: {
-            display: false,
+            //highlight value 0
+            color: ctx => ctx.tick.value === 0 && '#eee',
+            lineWidth: 4,
+            lineRadius: 10,
           },
           ticks: {
             color: textColor,
@@ -376,6 +459,7 @@ const onlineView = async () => {
           title: {
             display: true,
             text: 'Dzień',
+            color: textColor,
           },
           border: {
             display: false,
@@ -441,11 +525,15 @@ const onlineView = async () => {
         legend: {
           position: 'bottom',
           lineWidth: 0,
+          labels: {
+            color: textColor,
+          },
         },
       },
     },
   })
 
+  //transaction render
   const transactionList = document.querySelector('#transactions')
   const transactionListMobile = document.querySelector('#transactionsMobile')
   for (let transaction of transactions) {
@@ -459,10 +547,7 @@ const onlineView = async () => {
     }</div></div>
   <div class="item">${transaction.amount} zł</div>
   <div class="item">${transaction.balance} zł</div>
-  <div class="item description">
-    <div>Numer karty</div>
-    <div>Zbliżeniowo/Blik</div>
-  </div> 
+ 
     `
     transactionList.appendChild(div)
 
@@ -475,6 +560,7 @@ const onlineView = async () => {
     <div> Saldo przed transakcją: ${transaction.balance} zł</div>
     <div>Opis: ${transaction.description}</div>
     <div>Typ: ${transactionTypes[transaction.type - 1][1]}</div>
+
     `
     expandDiv.className = 'transaction-details'
 
@@ -537,59 +623,59 @@ const view = content => {
 
   switch (content) {
     case 'register':
-      html = `<form class="form-style" onsubmit="register(event)">
-      <span class="action">Rejestracja</span>
+      html = `<form class="form-style" onsubmit="register(event)" autocomplete="off">
+      <span class="action">${languageObject[currentLang].form.actionRegister}</span>
     <div class="wrapper">
-      <label for="username">Nazwa użytkownika</label>
+      <label for="username">${languageObject[currentLang].form.username}</label>
       <input type="text" id="username" />
       <div class="error-text"></div>
     </div>
     <div class="wrapper">
-      <label for="password">Hasło</label>
+      <label for="password">${languageObject[currentLang].form.password}</label>
       <input type="password" id="password" />
       <div class="error-text"></div>
     </div>
     <div class="wrapper">
-      <label for="email">Email</label>
+      <label for="email">${languageObject[currentLang].form.email}</label>
       <input type="text" id="email" />
       <div class="error-text"></div>
 
     </div>
     <div class="wrapper">
-      <label for="rep_email">Potwierdź email</label>
+      <label for="rep_email">${languageObject[currentLang].form.confirm}</label>
       <input type="text" id="rep_email" />
       <div class="error-text"></div>
 
     </div>
     <div class="submit-section">
-    <button class="btn submit" >Zarejestruj</button>
-      <button class="btn return" id="return" type="button">Powrót</button>
+    <button class="btn submit" >${languageObject[currentLang].button.createAccount}</button>
+      <button class="btn return" id="return" type="button">${languageObject[currentLang].button.return}</button>
       </div>
     </form>`
       break
     case 'login':
-      html = `<form class="form-style" onsubmit="login(event)">
-      <span class="action">Logowanie</span>
+      html = `<form class="form-style" onsubmit="login(event)" autocomplete="off">
+      <span class="action">${languageObject[currentLang].form.actionLogin}</span>
       <div class="wrapper">
-        <label for="email">Nazwa użytkownika / Email</label>
-        <input type="text" id="email" />
+        <label for="field">${languageObject[currentLang].form.field}</label>
+        <input type="text" id="field" />
       <div class="error-text"></div>
 
       </div>
       <div class="wrapper">
-        <label for="password">Hasło</label>
+        <label for="password">${languageObject[currentLang].form.password}</label>
         <input type="password" id="password" />
       <div class="error-text"></div>
-
+      
       </div>
     <div class="submit-section">
-      <button class="btn submit">Zaloguj</button>
-      <button class="btn return" id="return" type="button">Powrót</button>
+      <button class="btn submit">${languageObject[currentLang].button.signIn}</button>
+      <button class="btn return" id="return" type="button">${languageObject[currentLang].button.return}</button>
       </div>
       </form>`
       break
     case 'offline':
-      html = `<p class="notif">Zaloguj się, by sprawdzić swoje transakcje.</p>`
+      html = `<p class="notif">${languageObject[currentLang].notification}</p>`
       break
 
     case 'online':
@@ -610,7 +696,15 @@ const view = content => {
 
       </section>
       <section class="transaction-list-section">
+      
           <div class="flex-section">
+          <div class="legend">
+          <div class="item"><span>Data</span></div>
+          <div class="item"><span>Typ</span></div>
+          <div class="item"><span>Opis</span></div>
+          <div class="item"><span>Kwota</span></div>
+          <div class="item"><span>Saldo</span></div>
+          </div>
             <div id="transactions" class="transaction-wrapper desktop-block"></div>
             <div id="transactionsMobile" class="transaction-wrapper mobile"></div>
           </div>
@@ -622,16 +716,31 @@ const view = content => {
       html = `
     <div class="suggest-section">
       <div>
-        <p>Podany email jest poprawny, ale nie występuje w naszej bazie danych.</p>
-        <p>Czy chesz stworzyć nowe konto na jego podstawie ?</p>
+        <p>${languageObject[currentLang].form.emailFree1}</p>
+        <p>${languageObject[currentLang].form.emailFree2}</p>
       </div>
       <div class="submit-section">
-         <button class="btn return">Tak</button>
-         <button class="btn return">Nie</button>
+         <button class="btn return">${languageObject[currentLang].form.accept}</button>
+         <button class="btn return">${languageObject[currentLang].form.decline}</button>
       </div>
     </div>`
       break
   }
 
   return html
+}
+
+//GENERATORS
+
+const generateCardNumber = () => {
+  const prefixes = [4486, 4614, 4615, 4716]
+  let creditCardNumber = ''
+
+  creditCardNumber += prefixes[Math.floor(Math.random() * prefixes.length)]
+
+  for (let i = 0; i < 12; i++) {
+    creditCardNumber += Math.floor(Math.random() * 10)
+  }
+
+  return creditCardNumber
 }
