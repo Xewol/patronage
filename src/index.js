@@ -486,6 +486,7 @@ const onlineView = async () => {
           label: languageObject[currentLang].chart.bar.label,
           data: saldo,
           borderRadius: 4,
+          //value > 0 green < red
           backgroundColor: ctx => (ctx.raw > 0 ? '#00b176' : '#c73c3e'),
         },
       ],
