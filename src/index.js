@@ -456,7 +456,7 @@ const onlineView = async () => {
     currentLang === 'pl' ? data.transacationTypes.pl : data.transacationTypes.en
   )
 
-  //spread back to array so i can .reverse(), because days are descending
+  //spread back to array so i can Array.reverse() later
   const uniqueDates = Array(...new Set(transactions.map(el => el.date)))
 
   //map through unique days and group them by dates, next since first element in array is latest saldo update we just take it's balance
@@ -480,6 +480,7 @@ const onlineView = async () => {
   new Chart(ctx1, {
     type: 'bar',
     data: {
+      //.reverse() because days are descending
       labels: uniqueDates.reverse(),
       datasets: [
         {
