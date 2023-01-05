@@ -36,6 +36,15 @@ const languageObject = {
       emailFree2: 'Czy chesz stworzyć nowe konto na jego podstawie ?',
       accept: 'Tak',
       decline: 'Nie',
+      error: {
+        required: 'To pole jest wymagane.',
+        range: 'Dozwolona długość to 6-16 znaków.',
+        syntax: 'Znaki specjalne nie są dozwolone.',
+        length: 'Minimalna długość to 6 znaków.',
+        email: 'Niewłaściwy mail.',
+        confirm: 'Oba pola muszą być takie same.',
+        login: 'Błędny login lub hasło.',
+      },
     },
     chart: {
       bar: {
@@ -75,6 +84,15 @@ const languageObject = {
       emailFree2: 'Would you like to create new account ?',
       accept: 'Yes',
       decline: 'No',
+      error: {
+        required: 'This field is required.',
+        range: 'Allowed length is 6-16 characters.',
+        syntax: 'Special characters are not allowed.',
+        length: 'Minimal length is 6 characters.',
+        email: 'Invalid mail.',
+        confirm: 'Fields must be equal.',
+        login: 'Invalid login or password.',
+      },
     },
     chart: {
       bar: {
@@ -113,39 +131,42 @@ const validate = input => {
   switch (input.id) {
     case 'username':
       if (!input.value) {
-        return setError(input, 'To pole jest wymagane')
+        return setError(input, languageObject[currentLang].form.error.required)
       }
+      //made so i could show length error in reality
+      //this should be in regex and would be better
       if (input.value.length < 6 || input.value.length > 16) {
-        return setError(input, 'Dozwolona długośc to 6-16 znaków.')
+        return setError(input, languageObject[currentLang].form.error.range)
       }
-      if (/[^\S]+/.test(input.value)) {
-        return setError(input, 'Znaki specjalne nie są dozwolone.')
+      if (!/^[a-zA-Z0-9]+$/.test(input.value)) {
+        return setError(input, languageObject[currentLang].form.error.syntax)
       }
       break
 
     case 'password':
       if (!input.value) {
-        return setError(input, 'To pole jest wymagane.')
+        return setError(input, languageObject[currentLang].form.error.required)
       }
       if (input.value.length < 6) {
-        return setError(input, 'Minimalna długość to 6 znaków.')
+        return setError(input, languageObject[currentLang].form.error.length)
       }
       break
 
     case 'email':
       if (!input.value) {
-        return setError(input, 'To pole jest wymagane.')
+        return setError(input, languageObject[currentLang].form.error.required)
       }
-      if (/[^\S+@\S+.\S+]/.test(input.value)) {
-        return setError(input, 'Niewłaściwy mail.')
+      //allowing alias connected by [+,-,_]
+      if (!/^[\w\+-]+@[^_\W]+\.[^_\W]+$/.test(input.value)) {
+        return setError(input, languageObject[currentLang].form.error.email)
       }
       break
     case 'rep_email':
       if (!input.value) {
-        return setError(input, 'To pole jest wymagane.')
+        return setError(input, languageObject[currentLang].form.error.required)
       }
       if (document.querySelector('#email').value !== input.value) {
-        return setError(input, 'Oba pola muszą być takie same.')
+        return setError(input, languageObject[currentLang].form.error.confirm)
       }
       break
   }
@@ -180,6 +201,11 @@ const login = event => {
   })
 
   const [field, password] = inputs
+
+  //determine if user provided email or username
+  field.id = /^[\w\+-]+@[^_\W]+\.[^_\W]+$/.test(field.value)
+    ? 'email'
+    : 'username'
   validate(field)
   validate(password)
 
@@ -192,24 +218,32 @@ const login = event => {
   const db = localStorage.db ? JSON.parse(localStorage.db) : []
 
   //check if field is username or email value
-  const isValidEmail = /\w+@\w+.\w+/.test(field.value)
 
-  let foundUser = isValidEmail
-    ? db.find(el => el.email === field.value)
-    : db.find(el => el.username === field.value)
+  let foundUser = db.find(el =>
+    field.id === 'email'
+      ? el.email === field.value
+      : el.username === field.value
+  )
 
   //email is valid but user was not found so we suggest making account
-  if (!foundUser && isValidEmail) {
+  if (!foundUser && field.id === 'email') {
     const app = document.querySelector('#app')
     app.innerHTML = view('emailNotTaken')
     const [accept, decline] = app.querySelectorAll('button')
     accept.addEventListener('click', () => {
       app.innerHTML = view('register')
+
+      //fill fields given by user
       app.querySelector('#email').value = field.value
       app.querySelector('#password').value = password.value
+
       app
         .querySelectorAll('input')
         .forEach(input => input.addEventListener('input', onInput))
+
+      document.querySelector('#return').addEventListener('click', () => {
+        offlineView()
+      })
     })
     decline.addEventListener('click', () => {
       app.innerHTML = view('login')
@@ -218,26 +252,19 @@ const login = event => {
         .forEach(input => input.addEventListener('input', onInput))
       document.querySelector('#return').addEventListener('click', () => {
         offlineView()
-        document.querySelector('#language').classList.remove('hidden')
       })
     })
     return
   }
   if (!foundUser) {
-    setError(
-      document.querySelector('#field'),
-      'Błędna nazwa użytkownika lub hasło.'
-    )
-    setError(
-      document.querySelector('#password'),
-      'Błędna nazwa użytkownika lub hasło.'
-    )
+    setError(field, languageObject[currentLang].form.error.login)
+    setError(password, languageObject[currentLang].form.error.login)
     return
   }
 
   if (foundUser && foundUser.password !== hashedPassword) {
-    setError(document.querySelector('#field'), 'Błędny email lub hasło')
-    setError(document.querySelector('#password'), 'Błędny email lub hasło')
+    setError(field, languageObject[currentLang].form.error.login)
+    setError(password, languageObject[currentLang].form.error.login)
     return
   }
 
