@@ -118,7 +118,7 @@ const validate = input => {
       if (input.value.length < 6 || input.value.length > 16) {
         return setError(input, 'Dozwolona długośc to 6-16 znaków.')
       }
-      if (/[^A-Za-z0-9]+/.test(input.value)) {
+      if (/[^\S]+/.test(input.value)) {
         return setError(input, 'Znaki specjalne nie są dozwolone.')
       }
       break
@@ -136,7 +136,7 @@ const validate = input => {
       if (!input.value) {
         return setError(input, 'To pole jest wymagane.')
       }
-      if (!/\w+@\w+.\w+/.test(input.value)) {
+      if (/[^\S+@\S+.\S+]/.test(input.value)) {
         return setError(input, 'Niewłaściwy mail.')
       }
       break
