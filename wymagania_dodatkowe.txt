@@ -18,3 +18,4 @@ TODO:
     a) pogrupowanie według daty
     b) filtrowanie
 9. Własne zestawy
+

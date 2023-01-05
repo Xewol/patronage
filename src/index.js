@@ -44,6 +44,13 @@ const languageObject = {
         xAxis: 'Dzień',
       },
     },
+    legend: {
+      date: 'Data',
+      type: 'Typ',
+      description: 'Opis',
+      amount: 'Kwota',
+      balance: 'Saldo',
+    },
     notification: 'Zaloguj się, by sprawdzić swoje transakcje.',
   },
   en: {
@@ -75,6 +82,13 @@ const languageObject = {
         yAxis: 'Balance',
         xAxis: 'Day',
       },
+    },
+    legend: {
+      date: 'Date',
+      type: 'Type',
+      description: 'Description',
+      amount: 'Amount',
+      balance: 'Balance',
     },
     notification: 'You need to be signed in to view your transactions.',
   },
@@ -341,82 +355,105 @@ const onlineView = async () => {
   // ).then(res => res.json())
 
   const jsonDummy = {
-    meta: {},
-    record: {
-      transacationTypes: {
-        pl: {
-          1: 'Wpływy - inne',
-          2: 'Wydatki - zakupy',
-          3: 'Wpływy - wynagrodzenie',
-          4: 'Wydatki - inne',
-        },
-        en: {
-          1: 'Income - other',
-          2: 'Expenses - shopping',
-          3: 'Income - salary',
-          4: 'Expenses - other',
-        },
+    transacationTypes: {
+      pl: {
+        1: 'Wpływy - inne',
+        2: 'Wydatki - zakupy',
+        3: 'Wpływy - wynagrodzenie',
+        4: 'Wydatki - inne',
       },
-      transactions: [
-        {
-          date: '2022-11-12',
-          amount: -231.56,
-          description: 'Biedronka 13',
-          balance: 4337.25,
-          type: 2,
-        },
-        {
-          date: '2022-11-12',
-          amount: -31.56,
-          description: 'PayU Spółka Akcyjna',
-          balance: 4572.18,
-          type: 4,
-        },
-        {
-          date: '2022-11-12',
-          amount: 2137.69,
-          description: 'Wynagrodzenie z tytułu Umowy o Pracę',
-          balance: 2420.47,
-          type: 3,
-        },
-        {
-          date: '2022-11-10',
-          amount: -136,
-          description: 'Lidl',
-          balance: 2555.55,
-          type: 2,
-        },
-        {
-          date: '2022-11-10',
-          amount: 25,
-          description: 'Zrzutka na prezent dla Grażyny',
-          balance: 2847.66,
-          type: 1,
-        },
-        {
-          date: '2022-11-09',
-          amount: -111.11,
-          description: 'Biedronka 13',
-          balance: 3000,
-          type: 2,
-        },
-        {
-          date: '2022-11-09',
-          amount: -78.33,
-          description: 'PayU Spółka Akcyjna',
-          balance: 3027.51,
-          type: 4,
-        },
-      ],
-      cardNumber: generateCardNumber(),
+      en: {
+        1: 'Income - other',
+        2: 'Expenses - shopping',
+        3: 'Income - salary',
+        4: 'Expenses - other',
+      },
     },
+    transactions: [
+      {
+        date: '2022-11-11',
+        amount: -231.56,
+        description: 'Biedronka 13',
+        balance: 4337.25,
+        type: 2,
+      },
+      {
+        date: '2022-11-15',
+        amount: -231.56,
+        description: 'Biedronka 13',
+        balance: 4337.25,
+        type: 2,
+      },
+      {
+        date: '2022-11-14',
+        amount: -231.56,
+        description: 'Biedronka 13',
+        balance: 4337.25,
+        type: 2,
+      },
+      {
+        date: '2022-11-13',
+        amount: -231.56,
+        description: 'Biedronka 13',
+        balance: 4337.25,
+        type: 2,
+      },
+      {
+        date: '2022-11-12',
+        amount: -231.56,
+        description: 'Biedronka 13',
+        balance: 4337.25,
+        type: 2,
+      },
+      {
+        date: '2022-11-12',
+        amount: -31.56,
+        description: 'PayU Spółka Akcyjna',
+        balance: 4572.18,
+        type: 4,
+      },
+      {
+        date: '2022-11-12',
+        amount: 2137.69,
+        description: 'Wynagrodzenie z tytułu Umowy o Pracę',
+        balance: 2420.47,
+        type: 3,
+      },
+      {
+        date: '2022-11-10',
+        amount: -136,
+        description: 'Lidl',
+        balance: 2555.55,
+        type: 2,
+      },
+      {
+        date: '2022-11-10',
+        amount: 25,
+        description: 'Zrzutka na prezent dla Grażyny',
+        balance: 2847.66,
+        type: 1,
+      },
+      {
+        date: '2022-11-09',
+        amount: -111.11,
+        description: 'Biedronka 13',
+        balance: 3000,
+        type: 2,
+      },
+      {
+        date: '2022-11-09',
+        amount: -78.33,
+        description: 'PayU Spółka Akcyjna',
+        balance: 3027.51,
+        type: 4,
+      },
+    ],
+    cardNumber: generateCardNumber(),
   }
   const data = jsonDummy
-  const transactions = data.record.transactions
-  const transactionTypes = Object.entries(
-    currentLang === 'pl'
-      ? data.record.transacationTypes.pl
-      : data.record.transacationTypes.en
+  const transactions = data.transactions
+  const transactionTypes = Object.values(
+    currentLang === 'pl' ? data.transacationTypes.pl : data.transacationTypes.en
   )
 
   //spread back to array so i can .reverse(), because days are descending
@@ -519,7 +556,7 @@ const onlineView = async () => {
     type: 'doughnut',
 
     data: {
-      labels: transactionTypes.map(transaction => transaction[1]),
+      labels: transactionTypes,
       datasets: [
         {
           label: '%',
@@ -569,7 +606,7 @@ const onlineView = async () => {
   <div class="item">${transaction.date}</div>
   <div class="item "><img src='${renderIcon(transaction.type)}'/></div>
   <div class="item description">${transaction.description} <div class="type"> ${
-      transactionTypes[transaction.type - 1][1]
+      transactionTypes[transaction.type - 1]
     }</div></div>
   <div class="item">${transaction.amount} zł</div>
   <div class="item">${transaction.balance} zł</div>
@@ -585,7 +622,7 @@ const onlineView = async () => {
     }</div><div>Kwota transakcji: ${transaction.amount} zł</div></div>
     <div> Saldo przed transakcją: ${transaction.balance} zł</div>
     <div>Opis: ${transaction.description}</div>
-    <div>Typ: ${transactionTypes[transaction.type - 1][1]}</div>
+    <div>Typ: ${transactionTypes[transaction.type - 1]}</div>
 
     `
     expandDiv.className = 'transaction-details'
@@ -730,11 +767,11 @@ const view = content => {
       
           <div class="flex-section">
           <div class="legend">
-          <div class="item"><span>Data</span></div>
-          <div class="item"><span>Typ</span></div>
-          <div class="item"><span>Opis</span></div>
-          <div class="item"><span>Kwota</span></div>
-          <div class="item"><span>Saldo</span></div>
+          <div class="item"><span>${languageObject[currentLang].legend.date}</span></div>
+          <div class="item"><span>${languageObject[currentLang].legend.type}</span></div>
+          <div class="item"><span>${languageObject[currentLang].legend.description}</span></div>
+          <div class="item"><span>${languageObject[currentLang].legend.amount}</span></div>
+          <div class="item"><span>${languageObject[currentLang].legend.balance}</span></div>
           </div>
             <div id="transactions" class="transaction-wrapper desktop"></div>
             <div id="transactionsMobile" class="transaction-wrapper mobile"></div>
