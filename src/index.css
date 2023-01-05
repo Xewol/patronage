@@ -58,9 +58,6 @@ header{
   margin-bottom: 1rem;
 }
 
-.hidden{
-  display: none;
-}
 
 .btn-wrapper{
   display: flex;
@@ -431,9 +428,6 @@ header{
   width: calc(100% - 0.5rem);
 }
 
-.mobile{
-  display: flex;
-}
 
 ::-webkit-scrollbar{
   width: 0.5rem;
@@ -442,6 +436,15 @@ header{
 ::-webkit-scrollbar-thumb{
   background: var(--shadow);
      border-radius: 100vh;
+}
+
+
+.hidden{
+  display: none;
+}
+
+.mobile{
+  display: flex;
 }
 
 

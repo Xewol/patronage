@@ -298,8 +298,6 @@ const offlineView = () => {
       for (let btn of actionBtns.children) {
         btn.classList.remove('hidden')
       }
-      //also remove language changer button
-      document.querySelector('#language').classList.add('hidden')
 
       app.innerHTML = view(button.id)
 
