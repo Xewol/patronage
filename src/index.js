@@ -292,13 +292,14 @@ const offlineView = () => {
   actionBtns.innerHTML = `<button class="btn login" id="login">${languageObject[currentLang].button.login}</button>
   <button class="btn register" id="register">${languageObject[currentLang].button.register}</button>`
 
-  for (let button of actionBtns.childNodes) {
+  for (let button of actionBtns.children) {
     button.addEventListener('click', () => {
-      //remove class of both at the start
+      //unhide both at the start
       for (let btn of actionBtns.children) {
         btn.classList.remove('hidden')
       }
 
+      //render form
       app.innerHTML = view(button.id)
 
       //remove errors on input
