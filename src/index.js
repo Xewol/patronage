@@ -400,18 +400,18 @@ const onlineView = async () => {
     .map(day => transactions.filter(el => el.date === day))
     .map(group => group[0].balance)
 
-  const textColor = `#B0C4DE`
+  const textColor = `#b0c4de`
   const colors = [
-    '#203b52',
-    '#122a74',
-    '#219e9e',
-    '#2d848f',
-    '#365782',
-    '#2b778f',
-    '#127369',
-    '#00b176',
-    '#186f93',
-    '#203c54',
+    '#2ac49e',
+    '#1ca94b',
+    '#1f3d83',
+    '#097cbf',
+    '#6ed9cc',
+    '#31b36d',
+    '#2a4b7c',
+    '#4d6ec7',
+    '#77d0ad',
+    '#4a7b3c',
   ]
   new Chart(ctx1, {
     type: 'bar',
@@ -524,7 +524,6 @@ const onlineView = async () => {
       plugins: {
         legend: {
           position: 'bottom',
-          lineWidth: 0,
           labels: {
             color: textColor,
           },
@@ -572,16 +571,21 @@ const onlineView = async () => {
       //check if there is any expanded div and if
       //other that this transaction is clicked
       //this is done so i can close expanded div when clicked again on transaction
-      if (isExpanded && expandDiv.ariaExpanded === 'false')
+      if (isExpanded && expandDiv.ariaExpanded === 'false') {
         isExpanded.ariaExpanded = 'false'
+        //grab last selected and remove its class
+        document.querySelector('.selected').classList.remove('selected')
+      }
 
       expandDiv.ariaExpanded =
         expandDiv.ariaExpanded === 'true' ? 'false' : 'true'
-      if (expandDiv.ariaExpanded === 'true')
+      if (expandDiv.ariaExpanded === 'true') {
+        button.classList.add('selected')
         button.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         })
+      } else button.classList.remove('selected')
     }
     button.innerHTML = `
     <div class="item icon"><img src='${renderIcon(transaction.type)}'/></div>
@@ -681,7 +685,7 @@ const view = content => {
     case 'online':
       html = `<div class="main-section">
       <section class="charts" id="bars">
-      <button class="navigation" onclick="swap()">
+      <button class="navigation left" onclick="swap()">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" ><path fill="currentColor" d="M9.4 278.6c-12.5-12.5-12.5-32.8 0-45.3l128-128c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-128-128z"/></svg>
       </button>
         <div class="chart-wrapper" data-active="true">
@@ -690,7 +694,7 @@ const view = content => {
         <div class="chart-wrapper" data-active="false">
           <canvas id="doughnut-chart" class="doughnut"></canvas>
         </div>
-      <button class="navigation"onclick="swap()">
+      <button class="navigation right"onclick="swap()">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path fill="currentColor" d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z"/></svg>
       </button>
 
@@ -705,7 +709,7 @@ const view = content => {
           <div class="item"><span>Kwota</span></div>
           <div class="item"><span>Saldo</span></div>
           </div>
-            <div id="transactions" class="transaction-wrapper desktop-block"></div>
+            <div id="transactions" class="transaction-wrapper desktop"></div>
             <div id="transactionsMobile" class="transaction-wrapper mobile"></div>
           </div>
         </section>
