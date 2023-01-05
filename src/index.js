@@ -37,6 +37,13 @@ const languageObject = {
       accept: 'Tak',
       decline: 'Nie',
     },
+    chart: {
+      bar: {
+        label: 'Saldo na koniec dnia',
+        yAxis: 'Saldo',
+        xAxis: 'Dzień',
+      },
+    },
     notification: 'Zaloguj się, by sprawdzić swoje transakcje.',
   },
   en: {
@@ -61,6 +68,13 @@ const languageObject = {
       emailFree2: 'Would you like to create new account ?',
       accept: 'Yes',
       decline: 'No',
+    },
+    chart: {
+      bar: {
+        label: 'Balance at the end of the day',
+        yAxis: 'Balance',
+        xAxis: 'Day',
+      },
     },
     notification: 'You need to be signed in to view your transactions.',
   },
@@ -330,10 +344,18 @@ const onlineView = async () => {
     meta: {},
     record: {
       transacationTypes: {
-        1: 'Wpływy - inne',
-        2: 'Wydatki - zakupy',
-        3: 'Wpływy - wynagrodzenie',
-        4: 'Wydatki - inne',
+        pl: {
+          1: 'Wpływy - inne',
+          2: 'Wydatki - zakupy',
+          3: 'Wpływy - wynagrodzenie',
+          4: 'Wydatki - inne',
+        },
+        en: {
+          1: 'Income - other',
+          2: 'Expenses - shopping',
+          3: 'Income - salary',
+          4: 'Expenses - other',
+        },
       },
       transactions: [
         {
@@ -391,7 +413,12 @@ const onlineView = async () => {
   }
   const data = jsonDummy
   const transactions = data.record.transactions
-  const transactionTypes = Object.entries(data.record.transacationTypes)
+  const transactionTypes = Object.entries(
+    currentLang === 'pl'
+      ? data.record.transacationTypes.pl
+      : data.record.transacationTypes.en
+  )
+
   //spread back to array so i can .reverse(), because days are descending
   const uniqueDates = Array(...new Set(transactions.map(el => el.date)))
 
@@ -419,7 +446,7 @@ const onlineView = async () => {
       labels: uniqueDates.reverse(),
       datasets: [
         {
-          label: 'Saldo na koniec dnia',
+          label: languageObject[currentLang].chart.bar.label,
           data: saldo,
           borderRadius: 4,
           backgroundColor: ctx => (ctx.raw > 0 ? '#00b176' : '#c73c3e'),
@@ -439,7 +466,7 @@ const onlineView = async () => {
         y: {
           title: {
             display: true,
-            text: 'Saldo',
+            text: languageObject[currentLang].chart.bar.yAxis,
             color: textColor,
           },
           grid: {
@@ -458,7 +485,7 @@ const onlineView = async () => {
         x: {
           title: {
             display: true,
-            text: 'Dzień',
+            text: languageObject[currentLang].chart.bar.xAxis,
             color: textColor,
           },
           border: {
@@ -686,7 +713,7 @@ const view = content => {
       html = `<div class="main-section">
       <section class="charts" id="bars">
       <button class="navigation left" onclick="swap()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" ><path fill="currentColor" d="M9.4 278.6c-12.5-12.5-12.5-32.8 0-45.3l128-128c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-128-128z"/></svg>
+      <img src="../public/caret-left.svg"/>
       </button>
         <div class="chart-wrapper" data-active="true">
           <canvas id="bar-chart" class="bars"></canvas>
@@ -695,7 +722,7 @@ const view = content => {
           <canvas id="doughnut-chart" class="doughnut"></canvas>
         </div>
       <button class="navigation right"onclick="swap()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path fill="currentColor" d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z"/></svg>
+      <img src="../public/caret-right.svg"/>
       </button>
 
       </section>
