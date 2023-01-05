@@ -23,7 +23,6 @@ body {
   color: var(--text);
   min-height: 100vh;
   min-width: 100vw;
-
   /* need flex to make app's flex-grow: 1 working */
   display: flex;
   justify-content: center;
@@ -56,8 +55,7 @@ header{
   align-items: center;
   width: 100%;
   float: right;
-  margin-bottom: 0.5rem;
-
+  margin-bottom: 1rem;
 }
 
 .hidden{
@@ -118,6 +116,7 @@ header{
 }
 .lang-changer:hover{
   background-color: var(--text);
+  color: var(--background);
 }
 
 
@@ -273,18 +272,24 @@ header{
   width: 1.25rem;
   background-color: transparent;
   border:none;
-  color: var(--quaternary-lighter-dark);
   position: absolute;
+  
 }
-.navigation:active{
-  color: var(--quaternary-dark);
-}
+
 .right{
   right:10px;
+}
+.right:active{
+  transform: translateX(2px);
 }
 .left{
   left:10px;
 }
+.left:active{
+  transform: translateX(-2px);
+}
+
+
 .transaction-list-section{
   margin-top: 1rem;
   width: 100%;
@@ -293,6 +298,8 @@ header{
   max-height: 36vh;
   
 }
+
+
 .transaction-wrapper{
   width: 100%;
   border-radius: 0.635rem;
@@ -325,6 +332,7 @@ header{
   color: var(--buttons);
   border: none;
   text-align: center;
+  font-weight: bold;
 }
 
 
@@ -346,9 +354,10 @@ header{
 }
 
 .type{
-  font-size: x-small;
+  font-size: 0.75rem;
   font-style: italic;
   opacity: .7;
+  color: var(--text);
 }
 
 .desktop{
@@ -366,6 +375,7 @@ header{
 
 .transaction-details{
   font-size: small;
+  font-weight: bold;
   width: 95%;
   margin-inline: auto;
   display: flex;
@@ -381,6 +391,19 @@ header{
   transform-origin: top;
 }
 
+@keyframes grow {
+  0% {
+    transform: scaleY(0);
+  }
+  80% {
+    transform: scaleY(1.1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+
 [aria-expanded="true"]{
   animation:grow 0.3s ease-in-out forwards;
 }
@@ -389,8 +412,6 @@ header{
   padding: 0;
   overflow: hidden;
 }
-
-
 
 
 .selected{
@@ -403,7 +424,6 @@ header{
 .transaction-details:not(:last-child){
   margin-bottom: 0.5rem;
 }
-
 
 .legend{
   display:none;
@@ -426,12 +446,11 @@ header{
 
 
  @media (min-width:460px) {
-
   .transaction{
     font-size: 1.1rem;
   }
-  
 }
+
 @media (min-width:560px) {
 
   .transaction-details{
@@ -439,7 +458,6 @@ header{
   }
   
 }
-
 
  @media (min-width:769px) {
   .chart-wrapper{
@@ -486,23 +504,4 @@ header{
   box-shadow: 0px 4px 96px var(--square-shadow);
   }
 
- 
-
 }
-
-
-
-  @keyframes grow {
-    0% {
-      transform: scaleY(0);
-    }
-    80% {
-      transform: scaleY(1.1);
-    }
-    100% {
-      transform: scaleY(1);
-    }
-  }
-  
-
-
