@@ -39,7 +39,8 @@ const languageObject = {
       error: {
         required: 'To pole jest wymagane.',
         range: 'Dozwolona długość to 6-16 znaków.',
-        syntax: 'Znaki specjalne nie są dozwolone.',
+        syntax:
+          'Poprawna składnia: 5 liter, 1 liczba oraz dozwolone - _ [ ] / \\ ',
         length: 'Minimalna długość to 6 znaków.',
         email: 'Niewłaściwy mail.',
         confirm: 'Oba pola muszą być takie same.',
@@ -87,7 +88,8 @@ const languageObject = {
       error: {
         required: 'This field is required.',
         range: 'Allowed length is 6-16 characters.',
-        syntax: 'Special characters are not allowed.',
+        syntax:
+          'Correct structure: 5 letter, 1 number and - _ [ ] / \\ allowed.',
         length: 'Minimal length is 6 characters.',
         email: 'Invalid mail.',
         confirm: 'Fields must be equal.',
@@ -316,6 +318,7 @@ const register = event => {
 const onInput = e => {
   e.target.classList.remove('error')
   e.target.parentElement.lastElementChild.textContent = ''
+  validate(e.target)
 }
 
 const offlineView = () => {
