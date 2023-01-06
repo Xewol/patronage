@@ -138,7 +138,8 @@ const validate = input => {
       if (input.value.length < 6 || input.value.length > 16) {
         return setError(input, languageObject[currentLang].form.error.range)
       }
-      if (!/^[a-zA-Z0-9]+$/.test(input.value)) {
+      //Digit in any position at least 5 characters 1 digit and can use - \ / [ ] _
+      if (!/(?=.*\d)(?=[a-zA-Z]{5,})[\w-\/\\\[\]]*/.test(input.value)) {
         return setError(input, languageObject[currentLang].form.error.syntax)
       }
       break
@@ -156,8 +157,8 @@ const validate = input => {
       if (!input.value) {
         return setError(input, languageObject[currentLang].form.error.required)
       }
-      //allowing alias connected by [+,-,_]
-      if (!/^[\w\+-]+@[^_\W]+\.[^_\W]+$/.test(input.value)) {
+      //allowing alias connected by [ '+'  '-' '_' '.' ]
+      if (!/^[\w\+-\.]+@[a-zA-Z]+\.[a-zA-Z]+$/.test(input.value)) {
         return setError(input, languageObject[currentLang].form.error.email)
       }
       break
@@ -203,7 +204,7 @@ const login = event => {
   const [field, password] = inputs
 
   //determine if user provided email or username
-  field.id = /^[\w\+-]+@[^_\W]+\.[^_\W]+$/.test(field.value)
+  field.id = /^[\w\+-]+@[a-zA-Z]+\.[a-zA-Z]+$/.test(field.value)
     ? 'email'
     : 'username'
   validate(field)
@@ -292,6 +293,11 @@ const register = event => {
 
   //find if email is in use
   let foundUser = db.find(el => el.email === email.value)
+
+  //check for alias
+  //before + _ . -
+  //.+(?=@)
+
   if (foundUser) return setError(email, 'Email jest już w użyciu.')
 
   //find if username is in use

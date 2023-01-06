@@ -8,12 +8,11 @@ DONE:
     a) > 0 - zielone, < 0 - czerwone [x]
     b) 0 widoczne [x]
 11. Interfejs językowy [x]
+4. Walidacja nazwy (-_[]\/, 5 liter, 1 cyfra) [x]
 
 
 TODO:
-
-4. Walidacja nazwy (-_[]\/, 5 liter, 1 cyfra)
-5. Alias email
+5. Alias email []
 7. Historia transakcji
     a) pogrupowanie według daty
     b) filtrowanie
