@@ -8,6 +8,7 @@ DONE:
     a) > 0 - zielone, < 0 - czerwone [x]
     b) 0 widoczne [x]
 4. Walidacja nazwy (-_[]\/, 5 liter, 1 cyfra) [x]
+11. Interfejs językowy [x]
 
 
 TODO:
@@ -19,5 +20,4 @@ TODO:
 
 
 try textContent
-11. Interfejs językowy []
 

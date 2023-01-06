@@ -7,10 +7,46 @@ const changeLanguage = () => {
   currentLang = currentLang === 'pl' ? 'en' : 'pl'
   document.querySelector('#language').textContent = currentLang?.toUpperCase()
   localStorage.language = currentLang
-  if (localStorage.session) {
-    return onlineView()
+
+  //if user is not in onlineView we dont need to call innerHtml,
+  //textContent will work great
+  if (!localStorage.session) {
+    //traverse through whole nested object recursively
+    //and assign its key to acc[] then return acc
+    let translations = Object.values(languageObject).reduce(function recur(
+      acc,
+      value
+    ) {
+      if (typeof value === 'string') {
+        acc.push(value)
+      }
+      if (typeof value === 'object') {
+        return Object.values(value).reduce(recur, acc)
+      }
+      return acc
+    },
+    [])
+
+    const [pl, en] = [
+      translations.splice(0, translations.length / 2),
+      translations,
+    ]
+
+    //get visible html elements
+    const elements = document.querySelectorAll('[data-translate]')
+    for (let element of elements) {
+      //find right text in opposite language array,
+      //take its index and return value at that index in other array
+      element.textContent =
+        currentLang === 'pl'
+          ? pl[en.findIndex(text => element.textContent === text)]
+          : en[pl.findIndex(text => element.textContent === text)]
+    }
+  } else {
+    //just render onlineView,
+    //charts still need to rerender with correct data
+    onlineView()
   }
-  offlineView()
 }
 
 const languageObject = {
@@ -48,11 +84,9 @@ const languageObject = {
       },
     },
     chart: {
-      bar: {
-        label: 'Saldo na koniec dnia',
-        yAxis: 'Saldo',
-        xAxis: 'Dzień',
-      },
+      label: 'Saldo na koniec dnia',
+      yAxis: 'Saldo',
+      xAxis: 'Dzień',
     },
     legend: {
       date: 'Data',
@@ -97,11 +131,9 @@ const languageObject = {
       },
     },
     chart: {
-      bar: {
-        label: 'Balance at the end of the day',
-        yAxis: 'Balance',
-        xAxis: 'Day',
-      },
+      label: 'Balance at the end of the day',
+      yAxis: 'Balance',
+      xAxis: 'Day',
     },
     legend: {
       date: 'Date',
@@ -160,7 +192,7 @@ const validate = input => {
         return setError(input, languageObject[currentLang].form.error.required)
       }
       //allowing alias connected by [ '+'  '-' '_' '.' ]
-      if (!/^[\w\+-\.]+@[a-zA-Z]+\.[a-zA-Z]+$/.test(input.value)) {
+      if (!/^[\w\+-\.]+@[a-z]+\.[a-z]+$/.test(input.value)) {
         return setError(input, languageObject[currentLang].form.error.email)
       }
       break
@@ -206,7 +238,7 @@ const login = event => {
   const [field, password] = inputs
 
   //determine if user provided email or username
-  field.id = /^[\w\+-]+@[a-zA-Z]+\.[a-zA-Z]+$/.test(field.value)
+  field.id = /^[\w\+-\.]+@[a-z]+\.[a-z]+$/.test(field.value)
     ? 'email'
     : 'username'
   validate(field)
@@ -316,6 +348,8 @@ const register = event => {
 }
 
 const onInput = e => {
+  //ignore validation on first inputs
+  if (!e.target.classList.contains('error')) return
   e.target.classList.remove('error')
   e.target.parentElement.lastElementChild.textContent = ''
   validate(e.target)
@@ -325,8 +359,8 @@ const offlineView = () => {
   const app = document.querySelector('#app')
   app.innerHTML = view('offline')
   const actionBtns = document.querySelector('.btn-wrapper')
-  actionBtns.innerHTML = `<button class="btn login" id="login">${languageObject[currentLang].button.login}</button>
-  <button class="btn register" id="register">${languageObject[currentLang].button.register}</button>`
+  actionBtns.innerHTML = `<button class="btn login" id="login"data-translate>${languageObject[currentLang].button.login}</button>
+  <button class="btn register" id="register"data-translate>${languageObject[currentLang].button.register}</button>`
 
   for (let button of actionBtns.children) {
     button.addEventListener('click', () => {
@@ -372,10 +406,10 @@ const onlineView = async () => {
   const app = document.querySelector('#app')
   const actionBtns = document.querySelector('.btn-wrapper')
   document.querySelector('#language').classList.remove('hidden')
-  actionBtns.innerHTML = `<button class="btn logout" onclick="logout()">${languageObject[currentLang].button.logout}</button>`
+  actionBtns.innerHTML = `<button class="btn logout" onclick="logout()"data-translate>${languageObject[currentLang].button.logout}</button>`
   app.innerHTML = view('online')
-  const ctx1 = document.getElementById('bar-chart')
-  const ctx2 = document.getElementById('doughnut-chart')
+  const ctx1 = document.getElementById('bar-chart').getContext('2d')
+  const ctx2 = document.getElementById('doughnut-chart').getContext('2d')
 
   //28.12.2022 Requests exhausted.
 
@@ -519,7 +553,7 @@ const onlineView = async () => {
       labels: uniqueDates.reverse(),
       datasets: [
         {
-          label: languageObject[currentLang].chart.bar.label,
+          label: languageObject[currentLang].chart.label,
           data: saldo,
           borderRadius: 4,
           //value > 0 green < red
@@ -540,7 +574,7 @@ const onlineView = async () => {
         y: {
           title: {
             display: true,
-            text: languageObject[currentLang].chart.bar.yAxis,
+            text: languageObject[currentLang].chart.yAxis,
             color: textColor,
           },
           grid: {
@@ -559,7 +593,7 @@ const onlineView = async () => {
         x: {
           title: {
             display: true,
-            text: languageObject[currentLang].chart.bar.xAxis,
+            text: languageObject[currentLang].chart.xAxis,
             color: textColor,
           },
           border: {
@@ -729,58 +763,58 @@ const view = content => {
   switch (content) {
     case 'register':
       html = `<form class="form-style" onsubmit="register(event)" autocomplete="off">
-      <span class="action">${languageObject[currentLang].form.actionRegister}</span>
+      <span class="action"data-translate>${languageObject[currentLang].form.actionRegister}</span>
     <div class="wrapper">
-      <label for="username">${languageObject[currentLang].form.username}</label>
+      <label for="username"data-translate>${languageObject[currentLang].form.username}</label>
       <input type="text" id="username" />
       <div class="error-text"></div>
     </div>
     <div class="wrapper">
-      <label for="password">${languageObject[currentLang].form.password}</label>
+      <label for="password"data-translate>${languageObject[currentLang].form.password}</label>
       <input type="password" id="password" />
       <div class="error-text"></div>
     </div>
     <div class="wrapper">
-      <label for="email">${languageObject[currentLang].form.email}</label>
+      <label for="email"data-translate>${languageObject[currentLang].form.email}</label>
       <input type="text" id="email" />
       <div class="error-text"></div>
 
     </div>
     <div class="wrapper">
-      <label for="rep_email">${languageObject[currentLang].form.confirm}</label>
+      <label for="rep_email"data-translate>${languageObject[currentLang].form.confirm}</label>
       <input type="text" id="rep_email" />
       <div class="error-text"></div>
 
     </div>
     <div class="submit-section">
-    <button class="btn submit" >${languageObject[currentLang].button.createAccount}</button>
-      <button class="btn return" id="return" type="button">${languageObject[currentLang].button.return}</button>
+    <button class="btn submit" data-translate>${languageObject[currentLang].button.createAccount}</button>
+      <button class="btn return" id="return" type="button"data-translate>${languageObject[currentLang].button.return}</button>
       </div>
     </form>`
       break
     case 'login':
       html = `<form class="form-style" onsubmit="login(event)" autocomplete="off">
-      <span class="action">${languageObject[currentLang].form.actionLogin}</span>
+      <span class="action"data-translate>${languageObject[currentLang].form.actionLogin}</span>
       <div class="wrapper">
-        <label for="field">${languageObject[currentLang].form.field}</label>
+        <label for="field"data-translate>${languageObject[currentLang].form.field}</label>
         <input type="text" id="field" />
       <div class="error-text"></div>
 
       </div>
       <div class="wrapper">
-        <label for="password">${languageObject[currentLang].form.password}</label>
+        <label for="password"data-translate>${languageObject[currentLang].form.password}</label>
         <input type="password" id="password" />
       <div class="error-text"></div>
       
       </div>
     <div class="submit-section">
-      <button class="btn submit">${languageObject[currentLang].button.signIn}</button>
-      <button class="btn return" id="return" type="button">${languageObject[currentLang].button.return}</button>
+      <button class="btn submit"data-translate>${languageObject[currentLang].button.signIn}</button>
+      <button class="btn return" id="return" type="button"data-translate>${languageObject[currentLang].button.return}</button>
       </div>
       </form>`
       break
     case 'offline':
-      html = `<p class="notif">${languageObject[currentLang].notification}</p>`
+      html = `<p class="notif"data-translate>${languageObject[currentLang].notification}</p>`
       break
 
     case 'online':
@@ -801,14 +835,13 @@ const view = content => {
 
       </section>
       <section class="transaction-list-section">
-      
           <div class="flex-section">
           <div class="legend">
-          <div class="item"><span>${languageObject[currentLang].legend.date}</span></div>
-          <div class="item"><span>${languageObject[currentLang].legend.type}</span></div>
-          <div class="item"><span>${languageObject[currentLang].legend.description}</span></div>
-          <div class="item"><span>${languageObject[currentLang].legend.amount}</span></div>
-          <div class="item"><span>${languageObject[currentLang].legend.balance}</span></div>
+          <div class="item"data-translate>${languageObject[currentLang].legend.date}</div>
+          <div class="item"data-translate>${languageObject[currentLang].legend.type}</div>
+          <div class="item"data-translate>${languageObject[currentLang].legend.description}</div>
+          <div class="item"data-translate>${languageObject[currentLang].legend.amount}</div>
+          <div class="item"data-translate>${languageObject[currentLang].legend.balance}</div>
           </div>
             <div id="transactions" class="transaction-wrapper desktop"></div>
             <div id="transactionsMobile" class="transaction-wrapper mobile"></div>
@@ -821,12 +854,12 @@ const view = content => {
       html = `
     <div class="suggest-section">
       <div>
-        <p>${languageObject[currentLang].form.emailFree1}</p>
-        <p>${languageObject[currentLang].form.emailFree2}</p>
+        <pdata-translate>${languageObject[currentLang].form.emailFree1}</p>
+        <pdata-translate>${languageObject[currentLang].form.emailFree2}</p>
       </div>
       <div class="submit-section">
-         <button class="btn return">${languageObject[currentLang].form.accept}</button>
-         <button class="btn return">${languageObject[currentLang].form.decline}</button>
+         <button class="btn return"data-translate>${languageObject[currentLang].form.accept}</button>
+         <button class="btn return"data-translate>${languageObject[currentLang].form.decline}</button>
       </div>
     </div>`
       break
