@@ -9,15 +9,14 @@ DONE:
     b) 0 widoczne [x]
 4. Walidacja nazwy (-_[]\/, 5 liter, 1 cyfra) [x]
 11. Interfejs językowy [x]
+5. Alias email [x]
 
 
 TODO:
-5. Alias email []
 7. Historia transakcji
     a) pogrupowanie według daty
     b) filtrowanie
 9. Własne zestawy
 
 
-try textContent
 

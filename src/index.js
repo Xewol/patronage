@@ -252,8 +252,7 @@ const login = event => {
   //intialize empty db if there is none
   const db = localStorage.db ? JSON.parse(localStorage.db) : []
 
-  //check if field is username or email value
-
+  //find username searching with correct credentials
   let foundUser = db.find(el =>
     field.id === 'email'
       ? el.email === field.value
@@ -308,6 +307,22 @@ const login = event => {
   onlineView()
 }
 
+const stripAlias = string => {
+  //get value before @ character
+  let possibleAlias = /(.*)@/.exec(string)[1]
+
+  //if contains any of
+  if (/[-\+\._]/.test(possibleAlias)) {
+    //get name before alias
+    let strippedMail = /(.*?)[-\+\._]/.exec(string)[1]
+    //skip alias and get value after @ then append it to previous value
+    strippedMail += /@(.*$)/.exec(string)[0]
+    return strippedMail
+  }
+  //if no alias just skip
+  return string
+}
+
 const register = event => {
   event.preventDefault()
   //creating array so i can use Array.some
@@ -325,12 +340,13 @@ const register = event => {
   //intialize empty db if there is none
   const db = localStorage.db ? JSON.parse(localStorage.db) : []
 
-  //find if email is in use
-  let foundUser = db.find(el => el.email === email.value)
+  // get alias between symbol between alias and @
+  // let alias =/[-_+.].*?@/.exec(email)[0].slice(0,-1)
 
-  //check for alias
-  //before + _ . -
-  //.+(?=@)
+  //find if email is in use
+  let foundUser = db.find(
+    el => stripAlias(el.email) === stripAlias(email.value)
+  )
 
   if (foundUser) return setError(email, 'Email jest już w użyciu.')
 
