@@ -192,7 +192,7 @@ const validate = input => {
         return setError(input, languageObject[currentLang].form.error.required)
       }
       //allowing alias connected by [ '+'  '-' '_' '.' ]
-      if (!/^[\w\+-\.]+@[a-z]+\.[a-z]+$/.test(input.value)) {
+      if (!/^[\w\+-\.]+@[a-z\.]+\.[a-z]+$/.test(input.value)) {
         return setError(input, languageObject[currentLang].form.error.email)
       }
       break
@@ -238,7 +238,7 @@ const login = event => {
   const [field, password] = inputs
 
   //determine if user provided email or username
-  field.id = /^[\w\+-\.]+@[a-z]+\.[a-z]+$/.test(field.value)
+  field.id = /^[\w\+-\.]+@[a-z\.]+\.[a-z]+$/.test(field.value)
     ? 'email'
     : 'username'
   validate(field)
