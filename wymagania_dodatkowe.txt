@@ -16,7 +16,7 @@ TODO:
 7. Historia transakcji
     a) pogrupowanie według daty
     b) filtrowanie
-9. Własne zestawy
+9. Własne zestawy []
 
 
 

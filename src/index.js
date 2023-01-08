@@ -360,6 +360,7 @@ const register = event => {
     username: username.value,
     password: btoa(password.value),
     email: email.value,
+    data: accountData(),
   })
 }
 
@@ -418,6 +419,8 @@ const swap = () => {
   )
 }
 
+//async so i could await fetch don't need it since i created my own json data
+// I'll leave it just in case you wanted to know how i handled it.
 const onlineView = async () => {
   const app = document.querySelector('#app')
   const actionBtns = document.querySelector('.btn-wrapper')
@@ -439,116 +442,22 @@ const onlineView = async () => {
   //   }
   // ).then(res => res.json())
 
-  const jsonDummy = {
-    transacationTypes: {
-      pl: {
-        1: 'Wpływy - inne',
-        2: 'Wydatki - zakupy',
-        3: 'Wpływy - wynagrodzenie',
-        4: 'Wydatki - inne',
-      },
-      en: {
-        1: 'Income - other',
-        2: 'Expenses - shopping',
-        3: 'Income - salary',
-        4: 'Expenses - other',
-      },
-    },
-    transactions: [
-      {
-        date: '2022-11-11',
-        amount: -231.56,
-        description: 'Biedronka 13',
-        balance: 4337.25,
-        type: 2,
-      },
-      {
-        date: '2022-11-15',
-        amount: -231.56,
-        description: 'Biedronka 13',
-        balance: 4337.25,
-        type: 2,
-      },
-      {
-        date: '2022-11-14',
-        amount: -231.56,
-        description: 'Biedronka 13',
-        balance: 4337.25,
-        type: 2,
-      },
-      {
-        date: '2022-11-13',
-        amount: -231.56,
-        description: 'Biedronka 13',
-        balance: 4337.25,
-        type: 2,
-      },
-      {
-        date: '2022-11-12',
-        amount: -231.56,
-        description: 'Biedronka 13',
-        balance: 4337.25,
-        type: 2,
-      },
-      {
-        date: '2022-11-12',
-        amount: -31.56,
-        description: 'PayU Spółka Akcyjna',
-        balance: 4572.18,
-        type: 4,
-      },
-      {
-        date: '2022-11-12',
-        amount: 2137.69,
-        description: 'Wynagrodzenie z tytułu Umowy o Pracę',
-        balance: 2420.47,
-        type: 3,
-      },
-      {
-        date: '2022-11-10',
-        amount: -136,
-        description: 'Lidl',
-        balance: 2555.55,
-        type: 2,
-      },
-      {
-        date: '2022-11-10',
-        amount: 25,
-        description: 'Zrzutka na prezent dla Grażyny',
-        balance: 2847.66,
-        type: 1,
-      },
-      {
-        date: '2022-11-09',
-        amount: -111.11,
-        description: 'Biedronka 13',
-        balance: 3000,
-        type: 2,
-      },
-      {
-        date: '2022-11-09',
-        amount: -78.33,
-        description: 'PayU Spółka Akcyjna',
-        balance: 3027.51,
-        type: 4,
-      },
-    ],
-    cardNumber: generateCardNumber(),
-  }
-  const data = jsonDummy
+  const db = JSON.parse(localStorage.db)
+  const { data } = db.find(el => el.id === localStorage.session)
   const transactions = data.transactions
   const transactionTypes = Object.values(
     currentLang === 'pl' ? data.transacationTypes.pl : data.transacationTypes.en
   )
 
-  //spread back to array so i can Array.reverse() later
-  const uniqueDates = Array(...new Set(transactions.map(el => el.date)))
+  //spread back to array and reverse because days in data are descending
+  const uniqueDates = Array(
+    ...new Set(transactions.map(el => el.date))
+  ).reverse()
 
   //map through unique days and group them by dates, next since first element in array is latest saldo update we just take it's balance
   const saldo = Array(...uniqueDates)
     .map(day => transactions.filter(el => el.date === day))
     .map(group => group[0].balance)
-
   const textColor = `#b0c4de`
   const colors = [
     '#2ac49e',
@@ -565,8 +474,7 @@ const onlineView = async () => {
   new Chart(ctx1, {
     type: 'bar',
     data: {
-      //.reverse() because days are descending
-      labels: uniqueDates.reverse(),
+      labels: uniqueDates,
       datasets: [
         {
           label: languageObject[currentLang].chart.label,
@@ -747,7 +655,11 @@ const onlineView = async () => {
     transactionListMobile.append(button, expandDiv)
   }
 }
-
+/**
+ *
+ * @param {number} type
+ * @returns source to icon given by its transaction type
+ */
 const renderIcon = type => {
   let src
 
@@ -767,7 +679,6 @@ const renderIcon = type => {
   }
   return src
 }
-
 /**
  *
  * @param {string} content
@@ -884,17 +795,109 @@ const view = content => {
   return html
 }
 
-//GENERATORS
+/**
+ *
+ * @return generates transaction data for created user
+ */
+const accountData = () => {
+  /**
+   *
+   * @param {number} date in miliseconds
+   * @return takes day before given date and returns yyyy-mm-dd format
+   */
+  const backInTime = date => {
+    let tempDate = new Date(date)
+    tempDate.setDate(tempDate.getDate() - 1)
+    return `${tempDate.getFullYear()}-${String(
+      tempDate.getMonth() + 1
+    ).padStart(2, '0')}-${String(tempDate.getDate()).padStart(2, '0')}`
+  }
 
-const generateCardNumber = () => {
+  const generateAmount = number => {
+    let amount
+    switch (number) {
+      case 1:
+        amount = Number((20 + Math.random() * 80).toFixed(2))
+        break
+      case 2:
+        amount = -Number((50 + Math.random() * 250).toFixed(2))
+        break
+      case 3:
+        amount = Number((2000 + Math.random() * 3500).toFixed(2))
+        break
+      case 4:
+        amount = -Number((50 + Math.random() * 300).toFixed(2))
+        break
+      case 5:
+        amount = -Number((200 + Math.random() * 2000).toFixed(2))
+        break
+      case 6:
+        amount = -Number((50 + Math.random() * 250).toFixed(2))
+        break
+    }
+
+    return amount
+  }
+  const descriptions = {}
+  const transacationTypes = {
+    pl: {
+      1: 'Wpływy - inne',
+      2: 'Wydatki - zakupy',
+      3: 'Wpływy - wynagrodzenie',
+      4: 'Wydatki - inne',
+      5: 'Wydatki - dom',
+      6: 'Wydatki - samochód',
+    },
+    en: {
+      1: 'Income - other',
+      2: 'Expenses - shopping',
+      3: 'Income - salary',
+      4: 'Expenses - other',
+      5: 'Expenses - home',
+      6: 'Expenses - car',
+    },
+  }
+
+  const transactions = []
+
+  //create data for every day
+  let currentDate
+  let balance = Number((300 + Math.random() * 1700).toFixed(2))
+  let quantityOfTransactions
+  let avaibleTypes = Object.keys(transacationTypes.pl).map(Number)
+  for (let i = 0; i < 7; i++) {
+    const date = currentDate ? new Date(currentDate) : new Date()
+    currentDate = backInTime(date.getTime())
+    //for each day we create 2-4 transactions, so there is some data to present
+    quantityOfTransactions = Math.round(2 + Math.random() * 2)
+    for (let i = 0; i < quantityOfTransactions; i++) {
+      let type = avaibleTypes[Math.floor(Math.random() * avaibleTypes.length)]
+      const amount = generateAmount(type)
+
+      balance = Number((balance - amount).toFixed(2))
+      transactions.push({
+        date: currentDate,
+        amount,
+        description: 'test',
+        balance,
+        type,
+      })
+      if (type === 3) {
+        avaibleTypes = avaibleTypes.filter(el => el !== 3)
+      }
+    }
+  }
+
   const prefixes = [4486, 4614, 4615, 4716]
   let creditCardNumber = ''
 
   creditCardNumber += prefixes[Math.floor(Math.random() * prefixes.length)]
-
   for (let i = 0; i < 12; i++) {
     creditCardNumber += Math.floor(Math.random() * 10)
   }
-
-  return creditCardNumber
+  return {
+    transacationTypes,
+    transactions,
+    creditCardNumber,
+  }
 }
