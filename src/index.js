@@ -147,6 +147,7 @@ const languageObject = {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.log(accountData())
   const langBtn = document.querySelector('#language')
   langBtn.textContent = currentLang.toUpperCase()
   langBtn.onclick = changeLanguage
@@ -603,8 +604,8 @@ const onlineView = async () => {
   <div class="item description">${transaction.description} <div class="type"> ${
       transactionTypes[transaction.type - 1]
     }</div></div>
-  <div class="item">${transaction.amount} zł</div>
-  <div class="item">${transaction.balance} zł</div>
+  <div class="item">${transaction.amount.toFixed(2)} zł</div>
+  <div class="item">${transaction.balance.toFixed(2)} zł</div>
  
     `
     transactionList.appendChild(div)
@@ -614,8 +615,10 @@ const onlineView = async () => {
     expandDiv.innerHTML = `
     <div class="row"><div>Data: ${
       transaction.date
-    }</div><div>Kwota transakcji: ${transaction.amount} zł</div></div>
-    <div> Saldo przed transakcją: ${transaction.balance} zł</div>
+    }</div><div>Kwota transakcji: ${transaction.amount.toFixed(
+      2
+    )} zł</div></div>
+    <div> Saldo po transakcji: ${transaction.balance.toFixed(2)} zł</div>
     <div>Opis: ${transaction.description}</div>
     <div>Typ: ${transactionTypes[transaction.type - 1]}</div>
 
@@ -649,7 +652,7 @@ const onlineView = async () => {
     button.innerHTML = `
     <div class="item icon"><img src='${renderIcon(transaction.type)}'/></div>
     <div class="item">${transaction.description}</div>
-    <div class="item">${transaction.amount} zł</div>
+    <div class="item">${transaction.amount.toFixed(2)} zł</div>
     `
 
     transactionListMobile.append(button, expandDiv)
@@ -672,7 +675,12 @@ const renderIcon = type => {
       src = `../public/cash-payment-icon.svg
       `
       break
-    //others
+    case 5:
+      src = `../public/house.svg`
+      break
+    case 6:
+      src = `../public/car.svg`
+      break
     default:
       src = `../public/money-bill-transfer.svg`
       break
@@ -838,7 +846,34 @@ const accountData = () => {
 
     return amount
   }
-  const descriptions = {}
+  let descriptions = [
+    ['Za paliwo', 'Zrzutka na prezent', 'Na imprezę', 'Za jedzenie'],
+    [
+      'Biedronka ul. Kelemensa Janickiego 24',
+      'Biedronka ul. Stanisława Ignacego Witkiewicza 41',
+      'Lidl ul. Modra 9c',
+      'Lidl ul. Krasickiego 82',
+      'Żabka ul. Traugutta',
+      'Żabka ul. Adama Mickiewicza 134',
+    ],
+    [
+      'Wynagrodzenie z tytułu Umowy o Pracę',
+      'Wynagrodzenie miesięczne',
+      'Stypendium naukowe',
+    ],
+    ['PayU Spółka akcyjna', 'Płatność PayPal'],
+    [
+      'Ikea ul. Białowieska 2',
+      'Leroy Merlin ul. Golisza 10H',
+      'Jula ul. Mieszka I',
+      'Castorama ul. Ku Słońcu 67B',
+    ],
+    [
+      'Lotos SF366 K.2 Police',
+      'Strefa płatnego parkowania Szczecin',
+      'ORLEN Stacja nr 4259 Police',
+    ],
+  ]
   const transacationTypes = {
     pl: {
       1: 'Wpływy - inne',
@@ -865,26 +900,32 @@ const accountData = () => {
   let balance = Number((300 + Math.random() * 1700).toFixed(2))
   let quantityOfTransactions
   let avaibleTypes = Object.keys(transacationTypes.pl).map(Number)
+
   for (let i = 0; i < 7; i++) {
     const date = currentDate ? new Date(currentDate) : new Date()
     currentDate = backInTime(date.getTime())
     //for each day we create 2-4 transactions, so there is some data to present
     quantityOfTransactions = Math.round(2 + Math.random() * 2)
     for (let i = 0; i < quantityOfTransactions; i++) {
-      let type = avaibleTypes[Math.floor(Math.random() * avaibleTypes.length)]
+      const idx = Math.floor(Math.random() * avaibleTypes.length)
+      let type = avaibleTypes[idx]
       const amount = generateAmount(type)
 
-      balance = Number((balance - amount).toFixed(2))
       transactions.push({
         date: currentDate,
         amount,
-        description: 'test',
+        description:
+          descriptions[idx][
+            Math.floor(Math.random() * descriptions[idx].length)
+          ],
         balance,
         type,
       })
       if (type === 3) {
         avaibleTypes = avaibleTypes.filter(el => el !== 3)
+        descriptions = descriptions.filter((_, idx) => idx !== 2)
       }
+      balance = Number((balance - amount).toFixed(2))
     }
   }
 

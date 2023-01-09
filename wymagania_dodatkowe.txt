@@ -10,13 +10,13 @@ DONE:
 4. Walidacja nazwy (-_[]\/, 5 liter, 1 cyfra) [x]
 11. Interfejs językowy [x]
 5. Alias email [x]
+9. Własne zestawy [x]
 
 
 TODO:
 7. Historia transakcji
     a) pogrupowanie według daty
     b) filtrowanie
-9. Własne zestawy []
 
 
 
