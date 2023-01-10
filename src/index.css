@@ -333,7 +333,13 @@ header{
   font-weight: bold;
 }
 
+.card{
+  font-size: 0.75rem;
+}
 
+.space{
+  margin-top:0.25rem;
+}
 
  .item{
   display: flex;
@@ -379,7 +385,7 @@ header{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap:0.5rem;
+  gap:1rem;
   background: var(--squares);
   padding: 1rem;
   border-radius: 0.635rem;
@@ -453,6 +459,7 @@ header{
   .transaction{
     font-size: 1.1rem;
   }
+  
 }
 
 @media (min-width:560px) {
@@ -460,7 +467,9 @@ header{
   .transaction-details{
     font-size: 1.1rem;
   }
-  
+  .card{
+    font-size:0.9rem;
+  }
 }
 
  @media (min-width:769px) {

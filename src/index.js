@@ -94,7 +94,11 @@ const languageObject = {
       description: 'Opis',
       amount: 'Kwota',
       balance: 'Saldo',
+      card: 'Nr karty',
+      amountM: 'Kwota transakcji',
+      balanceM: 'Saldo po transakcji',
     },
+
     notification: 'Zaloguj się, by sprawdzić swoje transakcje.',
   },
   en: {
@@ -141,13 +145,15 @@ const languageObject = {
       description: 'Description',
       amount: 'Amount',
       balance: 'Balance',
+      card: 'Card number',
+      amountM: 'Payment amount',
+      balanceM: 'Balance after transaction',
     },
     notification: 'You need to be signed in to view your transactions.',
   },
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log(accountData())
   const langBtn = document.querySelector('#language')
   langBtn.textContent = currentLang.toUpperCase()
   langBtn.onclick = changeLanguage
@@ -601,9 +607,16 @@ const onlineView = async () => {
     div.innerHTML = `
   <div class="item">${transaction.date}</div>
   <div class="item "><img src='${renderIcon(transaction.type)}'/></div>
-  <div class="item description">${transaction.description} <div class="type"> ${
-      transactionTypes[transaction.type - 1]
-    }</div></div>
+  <div class="item description">${transaction.description} 
+    ${
+      transaction.creditCardNumber
+        ? `<div><div class="type">Nr karty:</div><div class="card">${transaction.creditCardNumber
+            .match(/.{4}/g)
+            .join(' ')}</div></div>`
+        : ''
+    }
+    <div class="type space">${transactionTypes[transaction.type - 1]}</div>
+    </div>
   <div class="item">${transaction.amount.toFixed(2)} zł</div>
   <div class="item">${transaction.balance.toFixed(2)} zł</div>
  
@@ -613,14 +626,28 @@ const onlineView = async () => {
     const expandDiv = document.createElement('div')
     expandDiv.ariaExpanded = 'false'
     expandDiv.innerHTML = `
-    <div class="row"><div>Data: ${
+    <div class="row"><div>${languageObject.en.legend.date}: ${
       transaction.date
-    }</div><div>Kwota transakcji: ${transaction.amount.toFixed(
-      2
-    )} zł</div></div>
-    <div> Saldo po transakcji: ${transaction.balance.toFixed(2)} zł</div>
-    <div>Opis: ${transaction.description}</div>
-    <div>Typ: ${transactionTypes[transaction.type - 1]}</div>
+    }</div><div>${
+      languageObject[currentLang].legend.amountM
+    }: ${transaction.amount.toFixed(2)} zł</div></div>
+    <div> ${
+      languageObject[currentLang].legend.balanceM
+    }: ${transaction.balance.toFixed(2)} zł</div>
+    <div>${languageObject[currentLang].legend.description}: ${
+      transaction.description
+    }</div>
+    <div class="row"><div>${languageObject[currentLang].legend.type}: ${
+      transactionTypes[transaction.type - 1]
+    }</div><div> ${
+      transaction.creditCardNumber
+        ? `<div><div>${
+            languageObject[currentLang].legend.card
+          }:</div><div class="card"> ${transaction.creditCardNumber
+            .match(/.{4}/g)
+            .join(' ')}</div></div>`
+        : ''
+    }</div></div>
 
     `
     expandDiv.className = 'transaction-details'
@@ -895,6 +922,14 @@ const accountData = () => {
 
   const transactions = []
 
+  const prefixes = [4486, 4614, 4615, 4716]
+  let creditCardNumber = ''
+
+  creditCardNumber += prefixes[Math.floor(Math.random() * prefixes.length)]
+  for (let i = 0; i < 12; i++) {
+    creditCardNumber += Math.floor(Math.random() * 10)
+  }
+
   //create data for every day
   let currentDate
   let balance = Number((300 + Math.random() * 1700).toFixed(2))
@@ -920,6 +955,7 @@ const accountData = () => {
           ],
         balance,
         type,
+        creditCardNumber: type !== 1 && type !== 3 ? creditCardNumber : null,
       })
       if (type === 3) {
         avaibleTypes = avaibleTypes.filter(el => el !== 3)
@@ -929,16 +965,8 @@ const accountData = () => {
     }
   }
 
-  const prefixes = [4486, 4614, 4615, 4716]
-  let creditCardNumber = ''
-
-  creditCardNumber += prefixes[Math.floor(Math.random() * prefixes.length)]
-  for (let i = 0; i < 12; i++) {
-    creditCardNumber += Math.floor(Math.random() * 10)
-  }
   return {
     transacationTypes,
     transactions,
-    creditCardNumber,
   }
 }
