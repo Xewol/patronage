@@ -180,7 +180,7 @@ const validate = input => {
         return setError(input, languageObject[currentLang].form.error.range)
       }
       //Digit in any position at least 5 characters 1 digit and can use - \ / [ ] _
-      if (!/(?=.*\d)(?=[a-zA-Z]{5,})[\w-\/\\\[\]]*/.test(input.value)) {
+      if (!/(?=.*\d)(?=[a-zA-Z]{5,})[\w-/\\[\]]*/.test(input.value)) {
         return setError(input, languageObject[currentLang].form.error.syntax)
       }
       break
@@ -199,7 +199,7 @@ const validate = input => {
         return setError(input, languageObject[currentLang].form.error.required)
       }
       //allowing alias connected by [ '+'  '-' '_' '.' ]
-      if (!/^[\w\+-\.]+@[a-z\.]+\.[a-z]+$/.test(input.value)) {
+      if (!/^[\w+-.]+@[a-z.]+\.[a-z]+$/.test(input.value)) {
         return setError(input, languageObject[currentLang].form.error.email)
       }
       break
@@ -319,9 +319,9 @@ const stripAlias = string => {
   let possibleAlias = /(.*)@/.exec(string)[1]
 
   //if contains any of
-  if (/[-\+\._]/.test(possibleAlias)) {
+  if (/[-+._]/.test(possibleAlias)) {
     //get name before alias
-    let strippedMail = /(.*?)[-\+\._]/.exec(string)[1]
+    let strippedMail = /(.*?)[-+._]/.exec(string)[1]
     //skip alias and get value after @ then append it to previous value
     strippedMail += /@(.*$)/.exec(string)[0]
     return strippedMail
