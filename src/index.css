@@ -339,7 +339,7 @@ header{
   margin-inline: auto;
   text-align: center;
   font-weight: bold;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   padding:0.5rem;
   border-radius: 0.635rem;
   background: var(--squares);
@@ -480,7 +480,9 @@ margin-bottom: 0;
   .transaction{
     font-size: 1.1rem;
   }
-  
+  .markdown{
+    font-size: 1.4rem;
+  }
 }
 
 @media (min-width:560px) {
