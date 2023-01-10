@@ -600,14 +600,14 @@ const onlineView = async () => {
 
   //transaction render
   const transactionList = document.querySelector('#transactions')
-  const transactionListMobile = document.querySelector('#transactionsMobile')
+  //append transaction for desktop
   for (let transaction of transactions) {
     const div = document.createElement('div')
     div.className = 'transaction'
     div.innerHTML = `
-  <div class="item">${transaction.date}</div>
-  <div class="item "><img src='${renderIcon(transaction.type)}'/></div>
-  <div class="item description">${transaction.description} 
+    <div class="item">${transaction.date}</div>
+    <div class="item "><img src='${renderIcon(transaction.type)}'/></div>
+    <div class="item description">${transaction.description} 
     ${
       transaction.creditCardNumber
         ? `<div><div class="type">Nr karty:</div><div class="card">${transaction.creditCardNumber
@@ -615,74 +615,96 @@ const onlineView = async () => {
             .join(' ')}</div></div>`
         : ''
     }
-    <div class="type space">${transactionTypes[transaction.type - 1]}</div>
-    </div>
-  <div class="item">${transaction.amount.toFixed(2)} zł</div>
-  <div class="item">${transaction.balance.toFixed(2)} zł</div>
- 
-    `
+          <div class="type space">${
+            transactionTypes[transaction.type - 1]
+          }</div>
+          </div>
+          <div class="item">${transaction.amount.toFixed(2)} zł</div>
+          <div class="item">${transaction.balance.toFixed(2)} zł</div>
+          
+          `
     transactionList.appendChild(div)
 
-    const expandDiv = document.createElement('div')
-    expandDiv.ariaExpanded = 'false'
-    expandDiv.innerHTML = `
+    //TODO add only date divs map across and add filtered transactions
+  }
+
+  /*
+
+
+*/
+
+  //append mobile transactions
+  const transactionListMobile = document.querySelector('#transactionsMobile')
+  for (const date of uniqueDates.reverse()) {
+    const dateDiv = document.createElement('div')
+    dateDiv.className = 'markdown'
+    dateDiv.textContent = date
+    transactionListMobile.appendChild(dateDiv)
+
+    for (const transaction of transactions.filter(
+      transaction => transaction.date === date
+    )) {
+      const expandDiv = document.createElement('div')
+      expandDiv.ariaExpanded = 'false'
+      expandDiv.innerHTML = `
     <div class="row"><div>${languageObject.en.legend.date}: ${
-      transaction.date
-    }</div><div>${
-      languageObject[currentLang].legend.amountM
-    }: ${transaction.amount.toFixed(2)} zł</div></div>
+        transaction.date
+      }</div><div>${
+        languageObject[currentLang].legend.amountM
+      }: ${transaction.amount.toFixed(2)} zł</div></div>
     <div> ${
       languageObject[currentLang].legend.balanceM
     }: ${transaction.balance.toFixed(2)} zł</div>
     <div>${languageObject[currentLang].legend.description}: ${
-      transaction.description
-    }</div>
+        transaction.description
+      }</div>
     <div class="row"><div>${languageObject[currentLang].legend.type}: ${
-      transactionTypes[transaction.type - 1]
-    }</div><div> ${
-      transaction.creditCardNumber
-        ? `<div><div>${
-            languageObject[currentLang].legend.card
-          }:</div><div class="card"> ${transaction.creditCardNumber
-            .match(/.{4}/g)
-            .join(' ')}</div></div>`
-        : ''
-    }</div></div>
+        transactionTypes[transaction.type - 1]
+      }</div><div> ${
+        transaction.creditCardNumber
+          ? `<div><div>${
+              languageObject[currentLang].legend.card
+            }:</div><div class="card"> ${transaction.creditCardNumber
+              .match(/.{4}/g)
+              .join(' ')}</div></div>`
+          : ''
+      }</div></div>
 
     `
-    expandDiv.className = 'transaction-details'
+      expandDiv.className = 'transaction-details'
 
-    const button = document.createElement('button')
-    button.className = 'transaction'
-    button.onclick = () => {
-      const isExpanded = document.querySelector('[aria-expanded="true"]')
+      const button = document.createElement('button')
+      button.className = 'transaction'
+      button.onclick = () => {
+        const isExpanded = document.querySelector('[aria-expanded="true"]')
 
-      //check if there is any expanded div and if
-      //other that this transaction is clicked
-      //this is done so i can close expanded div when clicked again on transaction
-      if (isExpanded && expandDiv.ariaExpanded === 'false') {
-        isExpanded.ariaExpanded = 'false'
-        //grab last selected and remove its class
-        document.querySelector('.selected').classList.remove('selected')
+        //check if there is any expanded div and if
+        //other that this transaction is clicked
+        //this is done so i can close expanded div when clicked again on transaction
+        if (isExpanded && expandDiv.ariaExpanded === 'false') {
+          isExpanded.ariaExpanded = 'false'
+          //grab last selected and remove its class
+          document.querySelector('.selected').classList.remove('selected')
+        }
+
+        expandDiv.ariaExpanded =
+          expandDiv.ariaExpanded === 'true' ? 'false' : 'true'
+        if (expandDiv.ariaExpanded === 'true') {
+          button.classList.add('selected')
+          button.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          })
+        } else button.classList.remove('selected')
       }
-
-      expandDiv.ariaExpanded =
-        expandDiv.ariaExpanded === 'true' ? 'false' : 'true'
-      if (expandDiv.ariaExpanded === 'true') {
-        button.classList.add('selected')
-        button.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        })
-      } else button.classList.remove('selected')
-    }
-    button.innerHTML = `
+      button.innerHTML = `
     <div class="item icon"><img src='${renderIcon(transaction.type)}'/></div>
     <div class="item">${transaction.description}</div>
     <div class="item">${transaction.amount.toFixed(2)} zł</div>
     `
 
-    transactionListMobile.append(button, expandDiv)
+      transactionListMobile.append(button, expandDiv)
+    }
   }
 }
 /**

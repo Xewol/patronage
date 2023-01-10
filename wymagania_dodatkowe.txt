@@ -15,7 +15,7 @@ DONE:
 
 TODO:
 7. Historia transakcji
-    a) pogrupowanie według daty
+    a) pogrupowanie według daty [x]
     b) filtrowanie
 
 
