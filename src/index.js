@@ -473,7 +473,7 @@ const onlineView = async () => {
   ).reverse()
 
   //map through unique days and group them by dates, next since first element in array is latest saldo update we just take it's balance
-  const saldo = Array(...uniqueDates)
+  const saldo = uniqueDates
     .map(day => transactions.filter(el => el.date === day))
     .map(group => group[0].balance)
   const textColor = `#b0c4de`
@@ -628,8 +628,6 @@ const onlineView = async () => {
           
           `
     transactionList.appendChild(div)
-
-    //TODO add only date divs map across and add filtered transactions
   }
 
   //append mobile transactions
