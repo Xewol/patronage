@@ -426,6 +426,16 @@ const swap = () => {
   )
 }
 
+const check = e => {
+  const buttonHandle = e.currentTarget
+  buttonHandle.ariaChecked =
+    buttonHandle.ariaChecked === 'true' ? 'false' : 'true'
+  const transactions = Array(...document.querySelectorAll('button.transaction'))
+  transactions
+    .filter(btn => btn.dataset.type !== buttonHandle.id)
+    .forEach(btn => btn.classList.add('hidden'))
+}
+
 //async so i could await fetch don't need it since i created my own json data
 // I'll leave it just in case you wanted to know how i handled it.
 const onlineView = async () => {
@@ -451,9 +461,10 @@ const onlineView = async () => {
 
   const db = JSON.parse(localStorage.db)
   const { data } = db.find(el => el.id === localStorage.session)
+  console.log(data)
   const transactions = data.transactions
   const transactionTypes = Object.values(
-    currentLang === 'pl' ? data.transacationTypes.pl : data.transacationTypes.en
+    currentLang === 'pl' ? data.transactionTypes.pl : data.transactionTypes.en
   )
 
   //spread back to array and reverse because days in data are descending
@@ -608,13 +619,6 @@ const onlineView = async () => {
     <div class="item">${transaction.date}</div>
     <div class="item "><img src='${renderIcon(transaction.type)}'/></div>
     <div class="item description">${transaction.description} 
-    ${
-      transaction.creditCardNumber
-        ? `<div><div class="type">Nr karty:</div><div class="card">${transaction.creditCardNumber
-            .match(/.{4}/g)
-            .join(' ')}</div></div>`
-        : ''
-    }
           <div class="type space">${
             transactionTypes[transaction.type - 1]
           }</div>
@@ -628,19 +632,17 @@ const onlineView = async () => {
     //TODO add only date divs map across and add filtered transactions
   }
 
-  /*
-
-
-*/
-
   //append mobile transactions
   const transactionListMobile = document.querySelector('#transactionsMobile')
+
   for (const date of uniqueDates.reverse()) {
+    //append all of dates as divs
     const dateDiv = document.createElement('div')
     dateDiv.className = 'markdown'
     dateDiv.textContent = date
     transactionListMobile.appendChild(dateDiv)
 
+    //for each transaction filter those with date in outer for loop and append them
     for (const transaction of transactions.filter(
       transaction => transaction.date === date
     )) {
@@ -675,6 +677,7 @@ const onlineView = async () => {
 
       const button = document.createElement('button')
       button.className = 'transaction'
+      button.dataset.type = transaction.type
       button.onclick = () => {
         const isExpanded = document.querySelector('[aria-expanded="true"]')
 
@@ -706,6 +709,20 @@ const onlineView = async () => {
       transactionListMobile.append(button, expandDiv)
     }
   }
+  //filter section
+  const iconDiv = document.querySelector('#icons')
+  const avaibleTypes = Object.keys(data.transactionTypes[currentLang]).map(
+    Number
+  )
+  for (const type of avaibleTypes) {
+    const button = document.createElement('button')
+    button.classList.add('type-filter', 'btn')
+    button.innerHTML = `<img src='${renderIcon(type)}' />`
+    button.ariaChecked = 'false'
+    button.id = type
+    button.onclick = check
+    iconDiv.appendChild(button)
+  }
 }
 /**
  *
@@ -716,22 +733,26 @@ const renderIcon = type => {
   let src
 
   switch (type) {
+    case 1:
+      src = '../public/income-other.svg'
+      break
     case 2:
       src = '../public/basket-shopping.svg'
       break
-
     case 3:
-      src = `../public/cash-payment-icon.svg
-      `
+      src = '../public/cash-payment-icon.svg'
+      break
+    case 4:
+      src = '../public/expense-other.svg'
       break
     case 5:
-      src = `../public/house.svg`
+      src = '../public/house.svg'
       break
     case 6:
-      src = `../public/car.svg`
+      src = '../public/car.svg'
       break
     default:
-      src = `../public/money-bill-transfer.svg`
+      src = '../public/money-bill-transfer.svg'
       break
   }
   return src
@@ -819,16 +840,20 @@ const view = content => {
 
       </section>
       <section class="transaction-list-section">
-          <div class="flex-section">
+        <div class="flex-section">
           <div class="legend">
-          <div class="item"data-translate>${languageObject[currentLang].legend.date}</div>
-          <div class="item"data-translate>${languageObject[currentLang].legend.type}</div>
-          <div class="item"data-translate>${languageObject[currentLang].legend.description}</div>
-          <div class="item"data-translate>${languageObject[currentLang].legend.amount}</div>
-          <div class="item"data-translate>${languageObject[currentLang].legend.balance}</div>
+            <div class="item"data-translate>${languageObject[currentLang].legend.date}</div>
+            <div class="item"data-translate>${languageObject[currentLang].legend.type}</div>
+            <div class="item"data-translate>${languageObject[currentLang].legend.description}</div>
+            <div class="item"data-translate>${languageObject[currentLang].legend.amount}</div>
+            <div class="item"data-translate>${languageObject[currentLang].legend.balance}</div>
           </div>
-            <div id="transactions" class="transaction-wrapper desktop"></div>
-            <div id="transactionsMobile" class="transaction-wrapper mobile"></div>
+          <div class="filter">
+          <input type="search" placeholder="Wyszukaj opisu..."></input>
+          <div class="icon-wrapper" id="icons"></div>
+          </div>
+          <div id="transactions" class="transaction-wrapper desktop"></div>
+          <div id="transactionsMobile" class="transaction-wrapper mobile"></div>
           </div>
         </section>
     </div>`
@@ -923,7 +948,7 @@ const accountData = () => {
       'ORLEN Stacja nr 4259 Police',
     ],
   ]
-  const transacationTypes = {
+  const transactionTypes = {
     pl: {
       1: 'Wpływy - inne',
       2: 'Wydatki - zakupy',
@@ -956,7 +981,7 @@ const accountData = () => {
   let currentDate
   let balance = Number((300 + Math.random() * 1700).toFixed(2))
   let quantityOfTransactions
-  let avaibleTypes = Object.keys(transacationTypes.pl).map(Number)
+  let avaibleTypes = Object.keys(transactionTypes[currentLang]).map(Number)
 
   for (let i = 0; i < 7; i++) {
     const date = currentDate ? new Date(currentDate) : new Date()
@@ -988,7 +1013,7 @@ const accountData = () => {
   }
 
   return {
-    transacationTypes,
+    transactionTypes: transactionTypes,
     transactions,
   }
 }
