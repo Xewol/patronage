@@ -99,6 +99,7 @@ const languageObject = {
       balanceM: 'Saldo po transakcji',
     },
 
+    placeholder: 'Wyszukaj po opisie...',
     notification: 'Zaloguj się, by sprawdzić swoje transakcje.',
   },
   en: {
@@ -149,6 +150,7 @@ const languageObject = {
       amountM: 'Payment amount',
       balanceM: 'Balance after transaction',
     },
+    placeholder: 'Search by description...',
     notification: 'You need to be signed in to view your transactions.',
   },
 }
@@ -427,16 +429,73 @@ const swap = () => {
 }
 
 const filter = e => {
-  //TODO render on each function call and then change
-  //TODO remove instead of class hidden
-  //TODO date div is now wrapper of teansactions and if !children remove date
-  const buttonHandle = e.currentTarget
-  buttonHandle.ariaChecked =
-    buttonHandle.ariaChecked === 'true' ? 'false' : 'true'
-  const transactions = Array(...document.querySelectorAll('button.transaction'))
-  transactions
-    .filter(btn => btn.dataset.type !== buttonHandle.id)
-    .forEach(btn => btn.classList.add('hidden'))
+  if (e.type === 'click') {
+    const checked = document.querySelector('[aria-checked="true"')
+    const transactions = Array(...document.querySelectorAll('[data-type]'))
+
+    //there is checked element and we click another
+    if (checked && checked !== e.currentTarget) {
+      document
+        .querySelectorAll('.markdown')
+        .forEach(el => el.classList.remove('hidden'))
+      transactions.forEach(el => el.classList.remove('hidden'))
+      checked.ariaChecked = 'false'
+    }
+    //TODO REPAIR
+    const buttonHandle = e.currentTarget
+    buttonHandle.ariaChecked =
+      buttonHandle.ariaChecked === 'true' ? 'false' : 'true'
+    if (buttonHandle.ariaChecked === 'true') {
+      transactions
+        .filter(el => el.dataset.type !== buttonHandle.id)
+        .forEach(el => el.classList.add('hidden'))
+
+      //hide unused date divs
+      document.querySelectorAll('.markdown').forEach(el => {
+        //prettier-ignore
+        if (Array(...el.nextElementSibling.children).every(child =>
+            child.classList.contains('hidden'))) {
+          el.classList.add('hidden')
+        }
+      })
+    } else {
+      transactions.forEach(el => {
+        el.classList.remove('hidden')
+      })
+      document
+        .querySelectorAll('.markdown')
+        .forEach(el => el.classList.remove('hidden'))
+    }
+    return
+  }
+  if (e.type === 'input') {
+    const transactions = Array(...document.querySelectorAll('#desc'))
+    transactions.forEach(el => {
+      const transactionButton = el.parentElement
+      const dropdownDiv = transactionButton.nextElementSibling
+      const wrapperDiv = transactionButton.parentElement
+      if (
+        !el.textContent.toLowerCase().includes(e.target.value.toLowerCase())
+      ) {
+        transactionButton.classList.add('hidden')
+        dropdownDiv.classList.add('hidden')
+
+        if (
+          Array(...wrapperDiv.children).every(child =>
+            child.classList.contains('hidden')
+          )
+        ) {
+          //date div
+          wrapperDiv.previousElementSibling.classList.add('hidden')
+        }
+      } else {
+        transactionButton.classList.remove('hidden')
+        dropdownDiv.classList.remove('hidden')
+        //date div
+        wrapperDiv.previousElementSibling.classList.remove('hidden')
+      }
+    })
+  }
 }
 
 //async so i could await fetch don't need it since i created my own json data
@@ -464,7 +523,6 @@ const onlineView = async () => {
 
   const db = JSON.parse(localStorage.db)
   const { data } = db.find(el => el.id === localStorage.session)
-  console.log(data)
   const transactions = data.transactions
   const transactionTypes = Object.values(
     currentLang === 'pl' ? data.transactionTypes.pl : data.transactionTypes.en
@@ -642,12 +700,15 @@ const onlineView = async () => {
     dateDiv.className = 'markdown'
     dateDiv.textContent = date
     transactionListMobile.appendChild(dateDiv)
-
+    const wrapper = document.createElement('div')
+    wrapper.className = 'test'
+    transactionListMobile.appendChild(wrapper)
     //for each transaction filter those with date in outer for loop and append them
     for (const transaction of transactions.filter(
       transaction => transaction.date === date
     )) {
       const expandDiv = document.createElement('div')
+      expandDiv.dataset.type = transaction.type
       expandDiv.ariaExpanded = 'false'
       expandDiv.innerHTML = `
     <div class="row"><div>${languageObject.en.legend.date}: ${
@@ -658,7 +719,7 @@ const onlineView = async () => {
     <div> ${
       languageObject[currentLang].legend.balanceM
     }: ${transaction.balance.toFixed(2)} zł</div>
-    <div>${languageObject[currentLang].legend.description}: ${
+    <div >${languageObject[currentLang].legend.description}: ${
         transaction.description
       }</div>
     <div class="row"><div>${languageObject[currentLang].legend.type}: ${
@@ -703,14 +764,15 @@ const onlineView = async () => {
       }
       button.innerHTML = `
     <div class="item icon"><img src='${renderIcon(transaction.type)}'/></div>
-    <div class="item">${transaction.description}</div>
+    <div class="item" id="desc">${transaction.description}</div>
     <div class="item">${transaction.amount.toFixed(2)} zł</div>
     `
 
-      transactionListMobile.append(button, expandDiv)
+      wrapper.append(button, expandDiv)
     }
   }
   //filter section
+  document.querySelector('#search').oninput = filter
   const iconDiv = document.querySelector('#icons')
   const avaibleTypes = Object.keys(data.transactionTypes[currentLang]).map(
     Number
@@ -845,12 +907,12 @@ const view = content => {
           <div class="legend">
             <div class="item"data-translate>${languageObject[currentLang].legend.date}</div>
             <div class="item"data-translate>${languageObject[currentLang].legend.type}</div>
-            <div class="item"data-translate>${languageObject[currentLang].legend.description}</div>
+            <div class="item"data-translate ">${languageObject[currentLang].legend.description}</div>
             <div class="item"data-translate>${languageObject[currentLang].legend.amount}</div>
             <div class="item"data-translate>${languageObject[currentLang].legend.balance}</div>
           </div>
           <div class="filter">
-          <input type="search" placeholder="Wyszukaj opisu..."></input>
+          <input type="search" id="search" placeholder="${languageObject[currentLang].placeholder}"></input>
           <div class="icon-wrapper" id="icons"></div>
           </div>
           <div id="transactions" class="transaction-wrapper desktop"></div>
@@ -1014,7 +1076,9 @@ const accountData = () => {
   }
 
   return {
-    transactionTypes: transactionTypes,
+    transactionTypes,
     transactions,
   }
 }
+
+//TODO remove unused data-translate

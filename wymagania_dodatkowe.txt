@@ -11,12 +11,12 @@ DONE:
 11. Interfejs językowy [x]
 5. Alias email [x]
 9. Własne zestawy [x]
+7. Historia transakcji
+    a) pogrupowanie według daty [x]
+    b) filtrowanie [x]
 
 
 TODO:
-7. Historia transakcji
-    a) pogrupowanie według daty [x]
-    b) filtrowanie
 
 
 
