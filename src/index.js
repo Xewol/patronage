@@ -426,7 +426,10 @@ const swap = () => {
   )
 }
 
-const check = e => {
+const filter = e => {
+  //TODO render on each function call and then change
+  //TODO remove instead of class hidden
+  //TODO date div is now wrapper of teansactions and if !children remove date
   const buttonHandle = e.currentTarget
   buttonHandle.ariaChecked =
     buttonHandle.ariaChecked === 'true' ? 'false' : 'true'
@@ -718,7 +721,7 @@ const onlineView = async () => {
     button.innerHTML = `<img src='${renderIcon(type)}' />`
     button.ariaChecked = 'false'
     button.id = type
-    button.onclick = check
+    button.onclick = filter
     iconDiv.appendChild(button)
   }
 }
