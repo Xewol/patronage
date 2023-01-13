@@ -462,7 +462,7 @@ header{
   border-top-right-radius: 0;
   color: var(--buttons);
   transform-origin: top;
-  margin-top:0.5rem;
+  margin-bottom:0.5rem;
 }
 
 
@@ -487,6 +487,8 @@ header{
 
 [aria-expanded="true"]{
   animation:grow 0.3s ease-in-out forwards;
+  margin-bottom: 0.5rem;
+
 }
 
 [aria-expanded="false"]{
