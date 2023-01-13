@@ -37,7 +37,6 @@ body {
   justify-content: center;
   align-items: center;
   flex-grow: 1;
-  height: 100%;
   flex-direction: column;
 
 }
@@ -46,7 +45,6 @@ body {
   font-style: italic;
   opacity: 0.60;
   text-align: center;
-
 }
 
 header{
@@ -65,7 +63,6 @@ header{
   display: flex;
   gap: 1rem;
   padding-right: 1rem;
-
 }
 
 .btn{
@@ -117,8 +114,6 @@ header{
   background-color: var(--text);
   color: var(--background);
 }
-
-
 
 
 .form-style{
@@ -330,7 +325,6 @@ header{
   height: 100%;
   display: flex;
   max-height: 48vh;
-  
 }
 
 
@@ -349,6 +343,7 @@ header{
   width: 100%;
   max-height: inherit;
   overflow-y: auto;
+
 }
 
 
