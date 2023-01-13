@@ -432,13 +432,19 @@ const filter = e => {
   if (e.type === 'click') {
     const checked = document.querySelector('[aria-checked="true"')
     const transactions = Array(...document.querySelectorAll('[data-type]'))
+    const dateDivs = document.querySelectorAll('.markdown')
+
+    const showTransactions = () => {
+      transactions.forEach(el => {
+        el.classList.remove('hidden')
+      })
+      dateDivs.forEach(el => el.classList.remove('hidden'))
+    }
 
     //there is checked element and we click another
     if (checked && checked !== e.currentTarget) {
-      document
-        .querySelectorAll('.markdown')
-        .forEach(el => el.classList.remove('hidden'))
-      transactions.forEach(el => el.classList.remove('hidden'))
+      showTransactions()
+      //aditionally uncheck button
       checked.ariaChecked = 'false'
     }
     //TODO REPAIR
@@ -446,6 +452,7 @@ const filter = e => {
     buttonHandle.ariaChecked =
       buttonHandle.ariaChecked === 'true' ? 'false' : 'true'
     if (buttonHandle.ariaChecked === 'true') {
+      //filter transactions wihtout given type and hide them
       transactions
         .filter(el => el.dataset.type !== buttonHandle.id)
         .forEach(el => el.classList.add('hidden'))
@@ -459,12 +466,7 @@ const filter = e => {
         }
       })
     } else {
-      transactions.forEach(el => {
-        el.classList.remove('hidden')
-      })
-      document
-        .querySelectorAll('.markdown')
-        .forEach(el => el.classList.remove('hidden'))
+      showTransactions()
     }
     return
   }
@@ -474,9 +476,9 @@ const filter = e => {
       const transactionButton = el.parentElement
       const dropdownDiv = transactionButton.nextElementSibling
       const wrapperDiv = transactionButton.parentElement
-      if (
-        !el.textContent.toLowerCase().includes(e.target.value.toLowerCase())
-      ) {
+      //prettier-ignore
+      if (!el.textContent.toLowerCase().includes(
+        e.target.value.toLowerCase())) {
         transactionButton.classList.add('hidden')
         dropdownDiv.classList.add('hidden')
 
