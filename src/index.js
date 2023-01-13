@@ -443,9 +443,8 @@ const swap = () => {
 const filter = e => {
   if (e.type === 'click') {
     const searchInput = document.querySelector('#search')
-    searchInput.disabled = searchInput.disabled ? false : true
-
     const checked = document.querySelector('[aria-checked="true"')
+    searchInput.disabled = searchInput.disabled ? false : true
     const transactions = Array(...document.querySelectorAll('[data-type]'))
     const historyDivs = document.querySelectorAll('.transaction-history')
 
@@ -465,6 +464,8 @@ const filter = e => {
       removeFilter()
       //aditionally uncheck button
       checked.ariaChecked = 'false'
+      //keep the input disabled
+      searchInput.disabled = true
     }
     const buttonHandle = e.currentTarget
     buttonHandle.ariaChecked =
