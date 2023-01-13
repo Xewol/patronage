@@ -1,6 +1,6 @@
 'use strict'
 
-//first check localStorage
+//first check localStorage for language if none then check html element lang
 let currentLang = localStorage.language ?? document.documentElement.lang
 
 const changeLanguage = () => {
@@ -157,8 +157,11 @@ const languageObject = {
 
 document.addEventListener('DOMContentLoaded', () => {
   const langBtn = document.querySelector('#language')
+  //change button text so user knows what language is on
   langBtn.textContent = currentLang.toUpperCase()
   langBtn.onclick = changeLanguage
+
+  //render correct view
   if (localStorage.session) {
     return onlineView()
   }
@@ -231,8 +234,25 @@ const createUser = userObj => {
   onlineView()
 }
 
+const stripAlias = string => {
+  //get value before @ character
+  let possibleAlias = /(.*)@/.exec(string)[1]
+
+  //if contains any of
+  if (/[-+._]/.test(possibleAlias)) {
+    //get name before alias
+    let strippedMail = /(.*?)[-+._]/.exec(string)[1]
+    //skip alias and get value after @ then append it to previous value
+    strippedMail += /@(.*$)/.exec(string)[0]
+    return strippedMail
+  }
+  //if no alias just skip
+  return string
+}
+
 const login = event => {
   event.preventDefault()
+
   //spread to array so i can use Array.some later
   const inputs = Array(...document.querySelectorAll('input'))
 
@@ -264,7 +284,8 @@ const login = event => {
   //find username searching with correct credentials
   let foundUser = db.find(el =>
     field.id === 'email'
-      ? el.email === field.value
+      ? //allow aliases
+        stripAlias(el.email) === stripAlias(field.value)
       : el.username === field.value
   )
 
@@ -314,22 +335,6 @@ const login = event => {
   //sign in user
   localStorage.setItem('session', foundUser.id)
   onlineView()
-}
-
-const stripAlias = string => {
-  //get value before @ character
-  let possibleAlias = /(.*)@/.exec(string)[1]
-
-  //if contains any of
-  if (/[-+._]/.test(possibleAlias)) {
-    //get name before alias
-    let strippedMail = /(.*?)[-+._]/.exec(string)[1]
-    //skip alias and get value after @ then append it to previous value
-    strippedMail += /@(.*$)/.exec(string)[0]
-    return strippedMail
-  }
-  //if no alias just skip
-  return string
 }
 
 const register = event => {
