@@ -433,9 +433,9 @@ header{
   border-radius: 0.375rem;
   padding-left: 0.5rem;
   border: none;
-  transition-duration: 300ms;
 }
 .search:disabled{
+  transition-duration: 300ms;
   opacity: 0.5;
 
 }
