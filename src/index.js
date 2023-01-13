@@ -75,8 +75,7 @@ const languageObject = {
       error: {
         required: 'To pole jest wymagane.',
         range: 'Dozwolona długość to 6-16 znaków.',
-        syntax:
-          'Poprawna składnia: 5 liter, 1 liczba oraz dozwolone - _ [ ] / \\ ',
+        syntax: 'Składnia: 5 liter, 1 liczba oraz dozwolone - _ [ ] / \\ ',
         length: 'Minimalna długość to 6 znaków.',
         email: 'Niewłaściwy mail.',
         confirm: 'Oba pola muszą być takie same.',
@@ -127,8 +126,7 @@ const languageObject = {
       error: {
         required: 'This field is required.',
         range: 'Allowed length is 6-16 characters.',
-        syntax:
-          'Correct structure: 5 letter, 1 number and - _ [ ] / \\ allowed.',
+        syntax: 'Structure: 5 letter, 1 number and - _ [ ] / \\ allowed.',
         length: 'Minimal length is 6 characters.',
         email: 'Invalid mail.',
         confirm: 'Fields must be equal.',
@@ -873,23 +871,23 @@ const view = content => {
     <div class="wrapper">
       <label for="username" data-translate>${languageObject[currentLang].form.username}</label>
       <input type="text" id="username" />
-      <div class="error-text"></div>
+      <div class="error-text" data-translate></div>
     </div>
     <div class="wrapper">
       <label for="password" data-translate>${languageObject[currentLang].form.password}</label>
       <input type="password" id="password" />
-      <div class="error-text"></div>
+      <div class="error-text" data-translate></div>
     </div>
     <div class="wrapper">
       <label for="email" data-translate>${languageObject[currentLang].form.email}</label>
       <input type="text" id="email" />
-      <div class="error-text"></div>
+      <div class="error-text" data-translate></div>
 
     </div>
     <div class="wrapper">
       <label for="rep_email" data-translate>${languageObject[currentLang].form.confirm}</label>
       <input type="text" id="rep_email" />
-      <div class="error-text"></div>
+      <div class="error-text" data-translate></div>
 
     </div>
     <div class="submit-section">
@@ -904,13 +902,13 @@ const view = content => {
       <div class="wrapper">
         <label for="field" data-translate>${languageObject[currentLang].form.field}</label>
         <input type="text" id="field" />
-      <div class="error-text"></div>
+      <div class="error-text" data-translate></div>
 
       </div>
       <div class="wrapper">
         <label for="password" data-translate>${languageObject[currentLang].form.password}</label>
         <input type="password" id="password" />
-      <div class="error-text"></div>
+      <div class="error-text" data-translate></div>
       
       </div>
     <div class="submit-section">
