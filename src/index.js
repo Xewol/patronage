@@ -447,7 +447,6 @@ const filter = e => {
       //aditionally uncheck button
       checked.ariaChecked = 'false'
     }
-    //TODO REPAIR
     const buttonHandle = e.currentTarget
     buttonHandle.ariaChecked =
       buttonHandle.ariaChecked === 'true' ? 'false' : 'true'
@@ -1084,3 +1083,4 @@ const accountData = () => {
 }
 
 //TODO remove unused data-translate
+//TODO both filters rescpect eachother
