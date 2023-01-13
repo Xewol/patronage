@@ -432,8 +432,11 @@ const swap = () => {
         chart.dataset.active === 'true' ? 'false' : 'true')
   )
 }
+
 //filters doesnt respect each other
 // so i just disable them if other is active
+
+//? filter hidden in other variable
 const filter = e => {
   if (e.type === 'click') {
     const searchInput = document.querySelector('#search')
@@ -441,18 +444,22 @@ const filter = e => {
 
     const checked = document.querySelector('[aria-checked="true"')
     const transactions = Array(...document.querySelectorAll('[data-type]'))
-    const dateDivs = document.querySelectorAll('.markdown')
+    const historyDivs = document.querySelectorAll('.transaction-history')
 
-    const showTransactions = () => {
+    const removeFilter = () => {
       transactions.forEach(el => {
         el.classList.remove('hidden')
+        el.nextElementSibling.classList.remove('hidden')
       })
-      dateDivs.forEach(el => el.classList.remove('hidden'))
+      historyDivs.forEach(el => {
+        el.classList.remove('hidden')
+        el.previousElementSibling.classList.remove('hidden')
+      })
     }
 
-    //there is checked element and we click another
+    //another button was checked while there was still one active, unhide all elements
     if (checked && checked !== e.currentTarget) {
-      showTransactions()
+      removeFilter()
       //aditionally uncheck button
       checked.ariaChecked = 'false'
     }
@@ -461,20 +468,25 @@ const filter = e => {
       buttonHandle.ariaChecked === 'true' ? 'false' : 'true'
     if (buttonHandle.ariaChecked === 'true') {
       //filter transactions wihtout given type and hide them
-      transactions
-        .filter(el => el.dataset.type !== buttonHandle.id)
-        .forEach(el => el.classList.add('hidden'))
-
-      //hide unused date divs
-      document.querySelectorAll('.markdown').forEach(el => {
+      transactions.forEach(el => {
+        //hide element if it doesnt meet filter requirements
+        if (el.dataset.type !== buttonHandle.id) {
+          el.classList.add('hidden')
+          el.nextElementSibling.classList.add('hidden')
+        }
+      })
+      //hide unused date divs and history transaction wrapper
+      historyDivs.forEach(el => {
         //prettier-ignore
-        if (Array(...el.nextElementSibling.children).every(child =>
+        if (Array(...el.children).every(child =>
             child.classList.contains('hidden'))) {
           el.classList.add('hidden')
+          el.previousElementSibling.classList.add('hidden')
         }
       })
     } else {
-      showTransactions()
+      //button if unclicked so show all elements again
+      removeFilter()
     }
     return
   }
@@ -490,26 +502,31 @@ const filter = e => {
     transactions.forEach(el => {
       const transactionButton = el.parentElement
       const dropdownDiv = transactionButton.nextElementSibling
-      const wrapperDiv = transactionButton.parentElement
       //prettier-ignore
       if (!el.textContent.toLowerCase().includes(
         e.target.value.toLowerCase())) {
+          //hide element that doesnt meet filter requirements
         transactionButton.classList.add('hidden')
         dropdownDiv.classList.add('hidden')
 
-        if (
-          Array(...wrapperDiv.children).every(child =>
-            child.classList.contains('hidden')
-          )
-        ) {
-          //date div
-          wrapperDiv.previousElementSibling.classList.add('hidden')
-        }
-      } else {
+      }
+      else{
+        //unhide elements 
         transactionButton.classList.remove('hidden')
         dropdownDiv.classList.remove('hidden')
-        //date div
-        wrapperDiv.previousElementSibling.classList.remove('hidden')
+      }
+    })
+    //after every markdown there is wrapper that holds every transactions after each date
+    //grab it
+    document.querySelectorAll('.transaction-history').forEach(el => {
+      //hide history div and date div if all elements inside are hidden
+      if (Array(...el.children).every(el => el.classList.contains('hidden'))) {
+        el.classList.add('hidden')
+        el.previousElementSibling.classList.add('hidden')
+      } else {
+        //dont hide them
+        el.classList.remove('hidden')
+        el.previousSibling.classList.remove('hidden')
       }
     })
   }
@@ -725,7 +742,6 @@ const onlineView = async () => {
       transaction => transaction.date === date
     )) {
       const expandDiv = document.createElement('div')
-      expandDiv.dataset.type = transaction.type
       expandDiv.ariaExpanded = 'false'
       expandDiv.innerHTML = `
     <div class="row"><div>${languageObject.en.legend.date}: ${

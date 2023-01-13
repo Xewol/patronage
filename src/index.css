@@ -360,7 +360,6 @@ header{
   border: none;
   text-align: center;
   font-weight: bold;
-  margin-top: 0.5rem;
 }
 
 .markdown{
@@ -374,14 +373,8 @@ header{
   background: var(--squares);
   box-shadow: 0px 4px 12px var(--square-shadow);
   border: none;
-  margin-bottom: 0.5rem;
 }
-.transaction-history{
-  margin-bottom:1rem;
-}
-.transaction-history:last-child{
-  margin-bottom: 0;
-}
+
 
 .card{
   font-size: 0.75rem;
@@ -447,7 +440,11 @@ header{
 
 }
 
-
+.transaction-history{
+  margin-block: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
 
 .transaction-details{
   font-size: small;
@@ -465,7 +462,9 @@ header{
   border-top-right-radius: 0;
   color: var(--buttons);
   transform-origin: top;
+  margin-top:0.5rem;
 }
+
 
 @keyframes grow {
   0% {
@@ -504,10 +503,6 @@ header{
 }
 
 
-.transaction-details:not(:last-child){
-  margin-bottom: 0.5rem;
-}
-
 .legend{
   display:none;
   font-weight: bold;
@@ -528,6 +523,7 @@ header{
 
 .hidden{
   display: none;
+
 }
 
 .mobile{
@@ -609,7 +605,6 @@ header{
   grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
   width: 100%;
   box-shadow: 0px 4px 96px var(--square-shadow);
-  margin-top: 0;
 
   }
 
