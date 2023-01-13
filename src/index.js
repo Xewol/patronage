@@ -385,8 +385,8 @@ const offlineView = () => {
   const app = document.querySelector('#app')
   app.innerHTML = view('offline')
   const actionBtns = document.querySelector('.btn-wrapper')
-  actionBtns.innerHTML = `<button class="btn login" id="login"data-translate>${languageObject[currentLang].button.login}</button>
-  <button class="btn register" id="register"data-translate>${languageObject[currentLang].button.register}</button>`
+  actionBtns.innerHTML = `<button class="btn login" id="login" data-translate>${languageObject[currentLang].button.login}</button>
+  <button class="btn register" id="register" data-translate>${languageObject[currentLang].button.register}</button>`
 
   for (let button of actionBtns.children) {
     button.addEventListener('click', () => {
@@ -427,9 +427,13 @@ const swap = () => {
         chart.dataset.active === 'true' ? 'false' : 'true')
   )
 }
-
+//filters doesnt respect each other
+// so i just disable them if other is active
 const filter = e => {
   if (e.type === 'click') {
+    const searchInput = document.querySelector('#search')
+    searchInput.disabled = searchInput.disabled ? false : true
+
     const checked = document.querySelector('[aria-checked="true"')
     const transactions = Array(...document.querySelectorAll('[data-type]'))
     const dateDivs = document.querySelectorAll('.markdown')
@@ -470,6 +474,13 @@ const filter = e => {
     return
   }
   if (e.type === 'input') {
+    const typeIcons = document.querySelector('#icons').childNodes
+    if (e.target.value.length > 0) {
+      typeIcons.forEach(el => (el.disabled = true))
+    } else {
+      typeIcons.forEach(el => (el.disabled = false))
+    }
+
     const transactions = Array(...document.querySelectorAll('#desc'))
     transactions.forEach(el => {
       const transactionButton = el.parentElement
@@ -505,7 +516,7 @@ const onlineView = async () => {
   const app = document.querySelector('#app')
   const actionBtns = document.querySelector('.btn-wrapper')
   document.querySelector('#language').classList.remove('hidden')
-  actionBtns.innerHTML = `<button class="btn logout" onclick="logout()"data-translate>${languageObject[currentLang].button.logout}</button>`
+  actionBtns.innerHTML = `<button class="btn logout" onclick="logout()">${languageObject[currentLang].button.logout}</button>`
   app.innerHTML = view('online')
   const ctx1 = document.getElementById('bar-chart').getContext('2d')
   const ctx2 = document.getElementById('doughnut-chart').getContext('2d')
@@ -702,7 +713,7 @@ const onlineView = async () => {
     dateDiv.textContent = date
     transactionListMobile.appendChild(dateDiv)
     const wrapper = document.createElement('div')
-    wrapper.className = 'test'
+    wrapper.className = 'transaction-history'
     transactionListMobile.appendChild(wrapper)
     //for each transaction filter those with date in outer for loop and append them
     for (const transaction of transactions.filter(
@@ -832,58 +843,58 @@ const view = content => {
   switch (content) {
     case 'register':
       html = `<form class="form-style" onsubmit="register(event)" autocomplete="off">
-      <span class="action"data-translate>${languageObject[currentLang].form.actionRegister}</span>
+      <span class="action" data-translate>${languageObject[currentLang].form.actionRegister}</span>
     <div class="wrapper">
-      <label for="username"data-translate>${languageObject[currentLang].form.username}</label>
+      <label for="username" data-translate>${languageObject[currentLang].form.username}</label>
       <input type="text" id="username" />
       <div class="error-text"></div>
     </div>
     <div class="wrapper">
-      <label for="password"data-translate>${languageObject[currentLang].form.password}</label>
+      <label for="password" data-translate>${languageObject[currentLang].form.password}</label>
       <input type="password" id="password" />
       <div class="error-text"></div>
     </div>
     <div class="wrapper">
-      <label for="email"data-translate>${languageObject[currentLang].form.email}</label>
+      <label for="email" data-translate>${languageObject[currentLang].form.email}</label>
       <input type="text" id="email" />
       <div class="error-text"></div>
 
     </div>
     <div class="wrapper">
-      <label for="rep_email"data-translate>${languageObject[currentLang].form.confirm}</label>
+      <label for="rep_email" data-translate>${languageObject[currentLang].form.confirm}</label>
       <input type="text" id="rep_email" />
       <div class="error-text"></div>
 
     </div>
     <div class="submit-section">
     <button class="btn submit" data-translate>${languageObject[currentLang].button.createAccount}</button>
-      <button class="btn return" id="return" type="button"data-translate>${languageObject[currentLang].button.return}</button>
+      <button class="btn return" id="return" type="button" data-translate>${languageObject[currentLang].button.return}</button>
       </div>
     </form>`
       break
     case 'login':
       html = `<form class="form-style" onsubmit="login(event)" autocomplete="off">
-      <span class="action"data-translate>${languageObject[currentLang].form.actionLogin}</span>
+      <span class="action" data-translate>${languageObject[currentLang].form.actionLogin}</span>
       <div class="wrapper">
-        <label for="field"data-translate>${languageObject[currentLang].form.field}</label>
+        <label for="field" data-translate>${languageObject[currentLang].form.field}</label>
         <input type="text" id="field" />
       <div class="error-text"></div>
 
       </div>
       <div class="wrapper">
-        <label for="password"data-translate>${languageObject[currentLang].form.password}</label>
+        <label for="password" data-translate>${languageObject[currentLang].form.password}</label>
         <input type="password" id="password" />
       <div class="error-text"></div>
       
       </div>
     <div class="submit-section">
-      <button class="btn submit"data-translate>${languageObject[currentLang].button.signIn}</button>
-      <button class="btn return" id="return" type="button"data-translate>${languageObject[currentLang].button.return}</button>
+      <button class="btn submit" data-translate>${languageObject[currentLang].button.signIn}</button>
+      <button class="btn return" id="return" type="button" data-translate>${languageObject[currentLang].button.return}</button>
       </div>
       </form>`
       break
     case 'offline':
-      html = `<p class="notif"data-translate>${languageObject[currentLang].notification}</p>`
+      html = `<p class="notif" data-translate>${languageObject[currentLang].notification}</p>`
       break
 
     case 'online':
@@ -906,14 +917,14 @@ const view = content => {
       <section class="transaction-list-section">
         <div class="flex-section">
           <div class="legend">
-            <div class="item"data-translate>${languageObject[currentLang].legend.date}</div>
-            <div class="item"data-translate>${languageObject[currentLang].legend.type}</div>
-            <div class="item"data-translate ">${languageObject[currentLang].legend.description}</div>
-            <div class="item"data-translate>${languageObject[currentLang].legend.amount}</div>
-            <div class="item"data-translate>${languageObject[currentLang].legend.balance}</div>
+            <div class="item">${languageObject[currentLang].legend.date}</div>
+            <div class="item">${languageObject[currentLang].legend.type}</div>
+            <div class="item" ">${languageObject[currentLang].legend.description}</div>
+            <div class="item">${languageObject[currentLang].legend.amount}</div>
+            <div class="item">${languageObject[currentLang].legend.balance}</div>
           </div>
           <div class="filter">
-          <input type="search" id="search" placeholder="${languageObject[currentLang].placeholder}"></input>
+          <input type="search" id="search" class="search" placeholder="${languageObject[currentLang].placeholder}"></input>
           <div class="icon-wrapper" id="icons"></div>
           </div>
           <div id="transactions" class="transaction-wrapper desktop"></div>
@@ -927,12 +938,12 @@ const view = content => {
       html = `
     <div class="suggest-section">
       <div>
-        <pdata-translate>${languageObject[currentLang].form.emailFree1}</p>
-        <pdata-translate>${languageObject[currentLang].form.emailFree2}</p>
+        <p data-translate>${languageObject[currentLang].form.emailFree1}</p>
+        <p data-translate>${languageObject[currentLang].form.emailFree2}</p>
       </div>
       <div class="submit-section">
-         <button class="btn return"data-translate>${languageObject[currentLang].form.accept}</button>
-         <button class="btn return"data-translate>${languageObject[currentLang].form.decline}</button>
+         <button class="btn return" data-translate>${languageObject[currentLang].form.accept}</button>
+         <button class="btn return" data-translate>${languageObject[currentLang].form.decline}</button>
       </div>
     </div>`
       break
@@ -1081,6 +1092,3 @@ const accountData = () => {
     transactions,
   }
 }
-
-//TODO remove unused data-translate
-//TODO both filters rescpect eachother
