@@ -270,6 +270,10 @@ const login = event => {
   field.id = /^[\w+.-]+@[a-z.]+\.[a-z]+$/.test(field.value)
     ? 'email'
     : 'username'
+
+  //change label html for acordingly
+  field.previousElementSibling.htmlFor = field.id
+
   validate(field)
   validate(password)
 
@@ -436,7 +440,6 @@ const swap = () => {
 //filters doesnt respect each other
 // so i just disable them if other is active
 
-//? filter hidden in other variable
 const filter = e => {
   if (e.type === 'click') {
     const searchInput = document.querySelector('#search')
@@ -485,7 +488,7 @@ const filter = e => {
         }
       })
     } else {
-      //button if unclicked so show all elements again
+      // if unclicked show all elements again
       removeFilter()
     }
     return
@@ -647,7 +650,8 @@ const onlineView = async () => {
     },
   })
 
-  //create array with the same length as transactions, its value at given index will store occurrence of transactionTypes eg. chartData[n] = 2 -> transactionType(n+1) occurred 2 times
+  //create array with the same length as transactions, its value at given index
+  //will store occurrence of transactionTypes eg. chartData[n] = 2 -> transactionType(n+1) occurred 2 times
   //then calculate procentage
   const chartData = Array.from({ length: transactionTypes.length })
     .fill(0)
